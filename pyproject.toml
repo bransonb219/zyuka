@@ -102,15 +102,6 @@ ignore_missing_imports = true
 
 # Command stubs lazily import modules that land in later milestones. These
 # overrides are removed as each milestone fills in its module.
-[[tool.mypy.overrides]]
-module = [
-    "linga.rights.subject",
-    "linga.rights.retention",
-    "linga.compliance.dpia",
-    "linga.compliance.consent",
-]
-ignore_missing_imports = true
-follow_imports = "silent"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
