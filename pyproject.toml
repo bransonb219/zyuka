@@ -107,8 +107,6 @@ module = [
     "linga.pipeline",
     "linga.indicators.pipeline",
     "linga.reports.pipeline",
-    "linga.security.audit",
-    "linga.security.crypto",
     "linga.rights.subject",
     "linga.rights.retention",
     "linga.compliance.dpia",
