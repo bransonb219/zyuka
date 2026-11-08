@@ -1,8 +1,9 @@
 """`linga init` — guided project setup.
 
-Real implementation lands in milestone 8. For now this writes the templates
-non-interactively when ``--yes`` is passed, so other commands have something
-to read against.
+Interactive wizard that writes ``linga.yml``, a ``logframe.yml`` template
+and nominates a key file path outside the project directory. Passing
+``--yes`` skips the prompts and uses the defaults, which keeps the
+end-to-end demo test fast.
 """
 
 from __future__ import annotations
@@ -16,14 +17,14 @@ from rich.console import Console
 console = Console()
 
 _LINGA_YML_TEMPLATE = """# linga.yml — Linga project configuration
-organisation: "Example NGO"
-programme: "Programme name"
-data_controller_contact: "dpo@example.org"
-retention_days: 1825
+organisation: "{organisation}"
+programme: "{programme}"
+data_controller_contact: "{data_controller}"
+retention_days: {retention_days}
 key_path: "{key_path}"
 
 protection:
-  small_cell_threshold: 5
+  small_cell_threshold: {small_cell}
   gps_decimals: 1
   drop_free_text: true
   keep_columns: []
@@ -78,6 +79,19 @@ def init(
         typer.Option("--key-path", help="Where the key file will live (outside the project)."),
     ] = None,
     yes: Annotated[bool, typer.Option("--yes", "-y", help="Non-interactive.")] = False,
+    organisation: Annotated[
+        str | None, typer.Option("--organisation", help="Organisation name.")
+    ] = None,
+    programme: Annotated[str | None, typer.Option("--programme", help="Programme name.")] = None,
+    data_controller: Annotated[
+        str | None, typer.Option("--data-controller", help="Data controller contact.")
+    ] = None,
+    retention_days: Annotated[
+        int | None, typer.Option("--retention-days", help="Retention period in days.")
+    ] = None,
+    small_cell: Annotated[
+        int | None, typer.Option("--small-cell", help="Suppression threshold.")
+    ] = None,
 ) -> None:
     """Scaffold ``linga.yml`` + ``logframe.yml`` and nominate a key file path."""
 
@@ -90,13 +104,41 @@ def init(
     linga_yml = directory / "linga.yml"
     logframe_yml = directory / "logframe.yml"
 
-    if not yes and (linga_yml.exists() or logframe_yml.exists()):
+    if linga_yml.exists() or logframe_yml.exists():
         console.print(
             "[yellow]linga.yml or logframe.yml already exists; refusing to overwrite.[/yellow]"
         )
         raise typer.Exit(code=1)
 
-    linga_yml.write_text(_LINGA_YML_TEMPLATE.format(key_path=key), encoding="utf-8")
+    if yes:
+        org = organisation or "Example NGO"
+        prog = programme or "Programme name"
+        dpo = data_controller or "dpo@example.org"
+        retention = retention_days or 1825
+        cell = small_cell or 5
+    else:
+        org = organisation or typer.prompt("Organisation name", default="Example NGO")
+        prog = programme or typer.prompt("Programme name", default="Programme name")
+        dpo = data_controller or typer.prompt(
+            "Data controller contact email", default="dpo@example.org"
+        )
+        retention = retention_days or typer.prompt(
+            "Retention period (days)", default=1825, type=int
+        )
+        cell = small_cell or typer.prompt("Small-cell threshold", default=5, type=int)
+        console.print(f"[dim]Key file will be created at:[/dim] {key}")
+
+    linga_yml.write_text(
+        _LINGA_YML_TEMPLATE.format(
+            organisation=org,
+            programme=prog,
+            data_controller=dpo,
+            retention_days=retention,
+            key_path=key,
+            small_cell=cell,
+        ),
+        encoding="utf-8",
+    )
     logframe_yml.write_text(_LOGFRAME_YML_TEMPLATE, encoding="utf-8")
 
     console.print(f"[green]Wrote[/green] {linga_yml}")

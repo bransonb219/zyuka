@@ -104,12 +104,10 @@ ignore_missing_imports = true
 # overrides are removed as each milestone fills in its module.
 [[tool.mypy.overrides]]
 module = [
-    "linga.pipeline",
     "linga.rights.subject",
     "linga.rights.retention",
     "linga.compliance.dpia",
     "linga.compliance.consent",
-    "linga.demo",
 ]
 ignore_missing_imports = true
 follow_imports = "silent"
