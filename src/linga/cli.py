@@ -7,14 +7,18 @@ and are rendered as plain language without a stack trace unless ``--debug``.
 
 from __future__ import annotations
 
+import functools
 import sys
-from typing import Annotated
+from collections.abc import Callable
+from typing import Annotated, Any, TypeVar
 
 import typer
 from rich.console import Console
 
 from linga import __version__
 from linga.errors import LingaError
+
+F = TypeVar("F", bound=Callable[..., Any])
 
 app = typer.Typer(
     name="linga",
@@ -55,10 +59,15 @@ def _bail(exc: LingaError) -> typer.Exit:
     return typer.Exit(code=1)
 
 
-def _handle(func):  # type: ignore[no-untyped-def]
-    """Decorator: render ``LingaError`` nicely and exit non-zero."""
+def _handle(func: F) -> F:
+    """Decorator: render ``LingaError`` nicely and exit non-zero.
 
-    def wrapper(*args, **kwargs):  # type: ignore[no-untyped-def]
+    Uses :func:`functools.wraps` so Typer's signature introspection still
+    sees the original parameters when it generates the CLI options.
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         try:
             return func(*args, **kwargs)
         except LingaError as exc:
@@ -68,9 +77,7 @@ def _handle(func):  # type: ignore[no-untyped-def]
                 raise
             raise _bail(exc) from None
 
-    wrapper.__name__ = func.__name__
-    wrapper.__doc__ = func.__doc__
-    return wrapper
+    return wrapper  # type: ignore[return-value]
 
 
 # Subcommands are registered from their respective modules below so each

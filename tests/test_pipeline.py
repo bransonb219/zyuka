@@ -95,6 +95,56 @@ def test_run_pipeline_encrypts_outputs(tmp_path: Path) -> None:
     assert result.report_excel.with_suffix(".xlsx.enc").exists()
 
 
+def test_lingaerror_renders_as_plain_message(tmp_path: Path) -> None:
+    """Running a command that raises ``LingaError`` must produce a clean message,
+    not a traceback, and exit non-zero."""
+
+    runner = CliRunner()
+    missing = tmp_path / "nope.csv"
+    result = runner.invoke(app, ["scan", str(missing)])
+    assert result.exit_code == 1, result.output
+    assert "Error:" in result.output
+    assert "Traceback" not in result.output
+
+
+def test_key_rotate_appends_audit_entry(tmp_path: Path) -> None:
+    """``key rotate`` is a mutating action and must be recorded in the audit log."""
+
+    import json
+
+    project_dir = _demo_project(tmp_path)
+    result = run_pipeline(project_dir=project_dir, rounds=list(ROUND_NAMES))
+    assert result.rounds
+
+    old_key = project_dir.parent / ".linga-keys" / "proj.key"
+    new_key = project_dir.parent / ".linga-keys" / "proj-new.key"
+
+    runner = CliRunner()
+    rot = runner.invoke(
+        app,
+        [
+            "key",
+            "rotate",
+            str(old_key),
+            str(new_key),
+            "--data",
+            str(project_dir / "outputs" / "protected"),
+            "--project",
+            str(project_dir),
+        ],
+    )
+    assert rot.exit_code == 0, rot.output
+
+    audit_log = project_dir / ".linga" / "audit.jsonl"
+    entries = [json.loads(line) for line in audit_log.read_text().splitlines()]
+    rotate_entries = [e for e in entries if e.get("command") == "key.rotate"]
+    assert len(rotate_entries) == 1
+    settings = rotate_entries[0]["settings"]
+    assert "old_fingerprint" in settings
+    assert "new_fingerprint" in settings
+    assert settings["old_fingerprint"] != settings["new_fingerprint"]
+
+
 def test_demo_produces_report(tmp_path: Path) -> None:
     out_dir = tmp_path / "linga-demo"
     report_path = run_demo(out_dir=out_dir, open_report=False)

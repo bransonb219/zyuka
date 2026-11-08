@@ -36,13 +36,29 @@ def rotate(
     old_key_path: Annotated[Path, typer.Argument(help="Current key.")],
     new_key_path: Annotated[Path, typer.Argument(help="New key to generate.")],
     data_dir: Annotated[Path, typer.Option("--data", help="Dir of pseudonymised CSVs.")],
+    project: Annotated[
+        Path, typer.Option("--project", help="Project directory for the audit log.")
+    ] = Path("."),
     password: Annotated[str | None, typer.Option("--password")] = None,
 ) -> None:
     """Rotate: generate a new key and re-pseudonymise ``data_dir``."""
 
-    from linga.security.keys import rotate_key
+    from linga.security.audit import write_entry
+    from linga.security.keys import load_key, rotate_key
 
+    old_key = load_key(old_key_path, password=password)
     manifest = rotate_key(old_key_path, new_key_path, data_dir, password=password)
+    new_key = load_key(new_key_path, password=password)
+    write_entry(
+        Path(project) / ".linga" / "audit.jsonl",
+        command="key.rotate",
+        inputs=[manifest],
+        outputs=[new_key_path],
+        settings={
+            "old_fingerprint": old_key.fingerprint,
+            "new_fingerprint": new_key.fingerprint,
+        },
+    )
     console.print(f"[green]Rotated.[/green] Mapping manifest: {manifest}")
 
 
