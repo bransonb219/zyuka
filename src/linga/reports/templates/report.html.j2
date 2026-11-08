@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ organisation|e }} — {{ programme|e }}</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 920px; margin: 2rem auto; padding: 0 1rem; color: #222; }
+    h1, h2, h3 { font-family: "Helvetica Neue", Arial, sans-serif; color: #112; }
+    .cover { border-bottom: 2px solid #335; padding-bottom: 1rem; margin-bottom: 2rem; }
+    .meta { color: #557; font-size: 0.9rem; }
+    .summary { background: #f4f4f8; padding: 1rem 1.2rem; border-left: 4px solid #335; }
+    .status-counts span { display: inline-block; margin-right: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 3px; font-size: 0.85rem; }
+    .status-on_track { background: #d7f1d9; }
+    .status-at_risk { background: #fff2c7; }
+    .status-off_track { background: #f6cccc; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { border: 1px solid #ccd; padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; font-size: 0.9rem; }
+    th { background: #eef; }
+    .indicator { margin: 1.4rem 0 2rem; padding-top: 0.6rem; border-top: 1px dotted #ccd; }
+    .charts img { max-width: 100%; height: auto; }
+    .issues li { color: #a33; }
+    @media print {
+      body { max-width: none; }
+      .indicator { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="cover">
+  <h1>{{ organisation|e }}</h1>
+  <h2>{{ programme|e }}</h2>
+  <p class="meta">Data controller: {{ data_controller|e }} · Generated {{ generated_at }} · Linga {{ version }}</p>
+</header>
+
+<section>
+  <h2>Executive summary</h2>
+  <div class="summary">
+    <p>{{ summary.paragraph|e }}</p>
+    <div class="status-counts">
+      {% for status, n in summary.counts.items() %}
+        <span class="status-{{ status }}">{{ status }}: {{ n }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% if validation %}
+<section>
+  <h2>Logframe validation</h2>
+  <ul class="issues">
+    {% for issue in validation %}
+      <li><strong>{{ issue.code|e }}</strong>: {{ issue.message|e }}
+        {% if issue.suggestion %} — <em>{{ issue.suggestion|e }}</em>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<section>
+  <h2>Data quality</h2>
+  {% if quality %}
+    <table>
+      <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+      <tbody>
+        {% for k, v in quality.items() %}
+          <tr><td>{{ k|e }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No quality report was supplied.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h2>Indicators</h2>
+  {% for ind in indicators %}
+    <div class="indicator">
+      <h3>{{ ind.code|e }} — {{ ind.name|e }}</h3>
+      <p class="meta">{{ ind.type|e }}{% if ind.unit %} · {{ ind.unit|e }}{% endif %}</p>
+
+      <table>
+        <thead>
+          <tr><th>Round</th><th>Value</th><th>Target</th><th>% of target</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          {% for p in ind.longitudinal %}
+            <tr>
+              <td>{{ p.round|e }}</td>
+              <td>{{ p.value if p.value is not none else "—" }}</td>
+              <td>{{ p.target if p.target is not none else "—" }}</td>
+              <td>{{ p.percent_of_target if p.percent_of_target is not none else "—" }}</td>
+              <td>{% if p.status %}<span class="status-{{ p.status }}">{{ p.status }}</span>{% else %}—{% endif %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="charts">
+        {% if ind.trend_chart %}
+          <img alt="Trend for {{ ind.code|e }}" src="{{ ind.trend_chart }}">
+        {% endif %}
+        {% for col, chart in ind.disaggregation_charts.items() %}
+          <img alt="{{ ind.code|e }} by {{ col|e }}" src="{{ chart }}">
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</section>
+
+<section>
+  <h2>Methodology and data protection</h2>
+  <p>
+    Data for this report was processed locally using Linga. Personal data was
+    pseudonymised with HMAC-SHA256, direct identifiers were dropped, GPS
+    coordinates were generalised, and small-cell suppression (n &lt; {{ small_cell_threshold }})
+    was applied to every table and chart. The organisation named above
+    remains the data controller for the purposes of Zambia's Data Protection
+    Act No. 3 of 2021.
+  </p>
+</section>
+
+</body>
+</html>
