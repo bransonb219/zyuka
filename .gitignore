@@ -1,2 +1,35 @@
+# Linga-specific — never commit real or working data
 CLAUDE.md
 .claude/
+.claude:settings.json
+data/
+outputs/
+linga-demo/
+*.key
+*.enc
+.linga/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+.eggs/
+
+# Tests / coverage
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
