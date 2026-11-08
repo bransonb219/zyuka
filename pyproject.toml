@@ -105,7 +105,6 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = [
     "linga.pipeline",
-    "linga.indicators.pipeline",
     "linga.reports.pipeline",
     "linga.rights.subject",
     "linga.rights.retention",
