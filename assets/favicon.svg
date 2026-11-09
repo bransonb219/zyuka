@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-  <!-- Favicon: flat colours so the embrace and seed stay crisp at 16x16. -->
+  <!-- Favicon: flat solids, no tilt, no filter, so the silhouette survives at 16x16. -->
   <path d="M 172,58 A 84,84 0 1 1 84,58"
-        fill="none" stroke="#0D9488" stroke-width="40" stroke-linecap="round"/>
+        fill="none" stroke="#0F766E" stroke-width="40" stroke-linecap="round"/>
   <circle cx="128" cy="64" r="34" fill="#F59E0B"/>
 </svg>
