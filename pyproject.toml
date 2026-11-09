@@ -63,11 +63,6 @@ Issues = "https://github.com/bransonb219/zyuka/issues"
 [tool.hatch.build.targets.wheel]
 packages = ["src/zyuka"]
 
-[tool.hatch.build.targets.wheel.force-include]
-"src/zyuka/data" = "zyuka/data"
-"src/zyuka/reports/templates" = "zyuka/reports/templates"
-"src/zyuka/compliance/templates" = "zyuka/compliance/templates"
-
 [tool.ruff]
 line-length = 100
 target-version = "py311"
