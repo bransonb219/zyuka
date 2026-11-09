@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Zyuka mark">
+  <title>Zyuka</title>
+  <desc>A thick indigo letter Z overlaid by a green shield, signalling data protection.</desc>
+  <!-- Indigo Z -->
+  <path d="M 24,32 L 232,32 L 232,80 L 72,176 L 232,176 L 232,224 L 24,224 L 24,176 L 184,80 L 24,80 Z"
+        fill="#1E3A8A"/>
+  <!-- Green shield centered on the diagonal, rounded top with soft curved base -->
+  <path d="M 128,92 L 168,108 L 168,140 Q 168,168 128,188 Q 88,168 88,140 L 88,108 Z"
+        fill="#198A48"/>
+</svg>

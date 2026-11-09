@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.svg" alt="Zyuka" width="360"/>
+</p>
+
 # Zyuka — Privacy-first M&E Toolkit
 
 [![Release](https://img.shields.io/github/v/release/bransonb219/zyuka?label=release&color=blue)](https://github.com/bransonb219/zyuka/releases/latest)

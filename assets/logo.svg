@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 120" role="img" aria-label="Zyuka">
+  <title>Zyuka</title>
+  <desc>Zyuka wordmark with the shield-on-Z monogram.</desc>
+  <!-- Mark, scaled to 100x100 at (10,10) -->
+  <g transform="translate(10,10) scale(0.390625)">
+    <path d="M 24,32 L 232,32 L 232,80 L 72,176 L 232,176 L 232,224 L 24,224 L 24,176 L 184,80 L 24,80 Z"
+          fill="#1E3A8A"/>
+    <path d="M 128,92 L 168,108 L 168,140 Q 168,168 128,188 Q 88,168 88,140 L 88,108 Z"
+          fill="#198A48"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="130" y="82"
+        font-family="'Inter','Helvetica Neue',system-ui,-apple-system,Segoe UI,Roboto,sans-serif"
+        font-size="68" font-weight="700" fill="#1E3A8A" letter-spacing="-1.5">zyuka</text>
+</svg>
