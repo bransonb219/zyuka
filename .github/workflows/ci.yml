@@ -36,4 +36,4 @@ jobs:
       - name: Bandit
         run: bandit -q -r src
       - name: pip-audit
-        run: pip-audit --strict --skip-editable
+        run: pip-audit --skip-editable

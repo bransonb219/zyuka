@@ -134,7 +134,7 @@ def init(
             programme=prog,
             data_controller=dpo,
             retention_days=retention,
-            key_path=key,
+            key_path=key.as_posix(),
             small_cell=cell,
         ),
         encoding="utf-8",
