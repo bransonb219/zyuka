@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Zyuka mark">
   <title>Zyuka</title>
   <desc>Monochrome variant for print, embossing and single-ink reproduction.</desc>
-  <g transform="rotate(6 128 128)" fill="#083344">
+  <g transform="rotate(28 128 128)" fill="#083344">
     <path d="M 172,62 A 84,84 0 1 1 84,62"
           fill="none" stroke="#083344" stroke-width="34" stroke-linecap="round"/>
     <circle cx="128" cy="66" r="30"/>

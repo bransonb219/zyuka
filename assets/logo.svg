@@ -20,7 +20,7 @@
     </linearGradient>
   </defs>
   <g transform="translate(10,10) scale(0.390625)">
-    <g transform="rotate(6 128 128)">
+    <g transform="rotate(28 128 128)">
       <path d="M 172,62 A 84,84 0 1 1 84,62"
             fill="none" stroke="url(#arcGrad)" stroke-width="34" stroke-linecap="round"/>
       <circle cx="128" cy="66" r="36" fill="#FBBF24" opacity="0.45" filter="url(#seedGlow)"/>

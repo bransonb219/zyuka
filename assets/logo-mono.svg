@@ -2,7 +2,7 @@
   <title>Zyuka</title>
   <desc>Monochrome wordmark for print, embossing and single-ink reproduction.</desc>
   <g transform="translate(10,10) scale(0.390625)">
-    <g transform="rotate(6 128 128)" fill="#083344">
+    <g transform="rotate(28 128 128)" fill="#083344">
       <path d="M 172,62 A 84,84 0 1 1 84,62"
             fill="none" stroke="#083344" stroke-width="34" stroke-linecap="round"/>
       <circle cx="128" cy="66" r="30"/>
