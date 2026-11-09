@@ -33,7 +33,7 @@ def _project(tmp_path: Path, retention_days: int = 1825) -> tuple[Path, Path]:
             programme="Demo",
             data_controller="dpo@example.org",
             retention_days=retention_days,
-            key_path=key_path,
+            key_path=key_path.as_posix(),
             small_cell=5,
         ).replace("retention_days: 1825", f"retention_days: {retention_days}"),
         encoding="utf-8",

@@ -25,7 +25,7 @@ def _write_project_files(project_dir: Path, key_path: Path) -> None:
             programme="Demo Programme",
             data_controller="dpo@example.org",
             retention_days=1825,
-            key_path=key_path,
+            key_path=key_path.as_posix(),
             small_cell=5,
         ),
         encoding="utf-8",
