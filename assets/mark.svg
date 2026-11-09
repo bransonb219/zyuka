@@ -1,9 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Zyuka mark">
   <title>Zyuka</title>
-  <desc>Dawn arc cradling a rising seed — awakening, protection, growth.</desc>
-  <!-- Indigo embrace: ~300° thick arc with rounded caps, open at the top -->
-  <path d="M 172,64 A 84,84 0 1 1 84,64"
-        fill="none" stroke="#1E3A8A" stroke-width="34" stroke-linecap="round"/>
-  <!-- Green seed cradled in the gap -->
-  <circle cx="128" cy="70" r="26" fill="#198A48"/>
+  <desc>Dawn arc cradling a rising sun — awakening, protection, warmth.</desc>
+  <defs>
+    <linearGradient id="arcGrad" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#0F766E"/>
+      <stop offset="100%" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <radialGradient id="seedGrad" cx="0.35" cy="0.3" r="0.8">
+      <stop offset="0%" stop-color="#FEF3C7"/>
+      <stop offset="45%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </radialGradient>
+  </defs>
+  <path d="M 172,62 A 84,84 0 1 1 84,62"
+        fill="none" stroke="url(#arcGrad)" stroke-width="34" stroke-linecap="round"/>
+  <circle cx="128" cy="66" r="30" fill="url(#seedGrad)"/>
 </svg>
