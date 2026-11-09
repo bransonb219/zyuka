@@ -1,7 +1,7 @@
 # Keyword lists for sensitive column detection under Zambia's Data Protection
 # Act No. 3 of 2021. Case-insensitive substring matches on column names.
 # These lists are intentionally conservative; organisations should extend them
-# via `protection.extra_sensitive_keywords` in linga.yml.
+# via `protection.extra_sensitive_keywords` in zyuka.yml.
 
 sex:
   - sex
