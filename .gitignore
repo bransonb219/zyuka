@@ -2,8 +2,8 @@
 CLAUDE.md
 .claude/
 .claude:settings.json
-data/
-outputs/
+/data/
+/outputs/
 zyuka-demo/
 *.key
 *.enc

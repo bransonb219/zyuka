@@ -1,0 +1,73 @@
+# Keyword lists for sensitive column detection under Zambia's Data Protection
+# Act No. 3 of 2021. Case-insensitive substring matches on column names.
+# These lists are intentionally conservative; organisations should extend them
+# via `protection.extra_sensitive_keywords` in linga.yml.
+
+sex:
+  - sex
+  - gender
+
+health:
+  - health
+  - medical
+  - diagnosis
+  - illness
+  - clinic
+  - hospital
+
+hiv:
+  - hiv
+  - viral load
+  - cd4
+  - art
+
+disability:
+  - disability
+  - disabled
+  - impairment
+  - washington_group
+
+marital_status:
+  - marital
+  - spouse
+  - widow
+  - divorce
+
+ethnicity:
+  - ethnic
+  - tribe
+  - race
+  - nationality
+
+religion:
+  - religion
+  - faith
+  - church
+  - mosque
+
+political_opinion:
+  - political
+  - party
+  - vote
+
+biometrics:
+  - biometric
+  - fingerprint
+  - iris
+  - face_scan
+
+identifiers:
+  - name
+  - surname
+  - fullname
+  - respondent_name
+  - nrc
+  - national_id
+  - passport
+  - phone
+  - msisdn
+  - email
+  - address
+  - gps
+  - geopoint
+  - coord
