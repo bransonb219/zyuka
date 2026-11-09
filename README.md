@@ -1,5 +1,11 @@
 # Zyuka — Privacy-first M&E Toolkit
 
+[![Release](https://img.shields.io/github/v/release/bransonb219/zyuka?label=release&color=blue)](https://github.com/bransonb219/zyuka/releases/latest)
+[![CI](https://img.shields.io/github/actions/workflow/status/bransonb219/zyuka/ci.yml?branch=master&label=CI)](https://github.com/bransonb219/zyuka/actions/workflows/ci.yml)
+[![Licence](https://img.shields.io/github/license/bransonb219/zyuka?color=green)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](pyproject.toml)
+[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macOS%20%7C%20windows-lightgrey)](.github/workflows/ci.yml)
+
 > **Zyuka** (pronounced *zyoo-KAH*) — from *Chizyuka*, a Tonga name borne by the
 > author. The toolkit guards beneficiary data while turning raw survey exports
 > into clean data, indicators and donor-ready reports.
