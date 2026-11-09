@@ -1,7 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-  <!-- Favicon: same mark, with slightly chunkier shield so detail survives at 16x16. -->
-  <path d="M 16,24 L 240,24 L 240,80 L 68,176 L 240,176 L 240,232 L 16,232 L 16,176 L 188,80 L 16,80 Z"
-        fill="#1E3A8A"/>
-  <path d="M 128,84 L 176,104 L 176,144 Q 176,176 128,196 Q 80,176 80,144 L 80,104 Z"
-        fill="#198A48"/>
+  <!-- Favicon: same geometry with slightly thicker stroke so the embrace reads at 16x16. -->
+  <path d="M 172,60 A 84,84 0 1 1 84,60"
+        fill="none" stroke="#1E3A8A" stroke-width="40" stroke-linecap="round"/>
+  <circle cx="128" cy="68" r="30" fill="#198A48"/>
 </svg>
