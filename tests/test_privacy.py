@@ -1,4 +1,4 @@
-"""Tests for linga.privacy.*.
+"""Tests for zyuka.privacy.*.
 
 Covers the four invariants that matter for M4:
 
@@ -21,8 +21,8 @@ import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from linga.pipeline_support import protect_dataframe
-from linga.privacy.generalise import (
+from zyuka.pipeline_support import protect_dataframe
+from zyuka.privacy.generalise import (
     age_to_band,
     drop_free_text,
     generalise_date_to_month,
@@ -30,8 +30,8 @@ from linga.privacy.generalise import (
     generalise_gps,
     lookup_admin_area,
 )
-from linga.privacy.minimise import extract_referenced_columns, minimise_columns
-from linga.privacy.patterns import (
+from zyuka.privacy.minimise import extract_referenced_columns, minimise_columns
+from zyuka.privacy.patterns import (
     EMAIL_RE,
     NRC_RE,
     mask_generic,
@@ -39,11 +39,11 @@ from linga.privacy.patterns import (
     matches_phone,
     normalise_phone,
 )
-from linga.privacy.pseudonymise import pseudonymise_series, pseudonymise_value
-from linga.privacy.scanner import scan_dataframe
-from linga.privacy.suppression import suppress_series, suppress_table
-from linga.security.keys import write_key
-from linga.synthetic import SyntheticOptions, generate_round
+from zyuka.privacy.pseudonymise import pseudonymise_series, pseudonymise_value
+from zyuka.privacy.scanner import scan_dataframe
+from zyuka.privacy.suppression import suppress_series, suppress_table
+from zyuka.security.keys import write_key
+from zyuka.synthetic import SyntheticOptions, generate_round
 
 # ---- patterns ---------------------------------------------------------------
 
@@ -258,7 +258,7 @@ def test_suppress_table_applies_secondary() -> None:
 
 
 def test_protect_dataframe_pseudonymises_and_generalises(tmp_path) -> None:  # type: ignore[no-untyped-def]
-    key = write_key(tmp_path / "linga.key")
+    key = write_key(tmp_path / "zyuka.key")
     df = generate_round("baseline", SyntheticOptions(rows_per_round=30, seed=11))
     protected, manifest_json = protect_dataframe(df, key=key)
     manifest = json.loads(manifest_json)
@@ -279,7 +279,7 @@ def test_protect_dataframe_pseudonymises_and_generalises(tmp_path) -> None:  # t
 
 
 def test_protect_manifest_never_contains_raw_values(tmp_path) -> None:  # type: ignore[no-untyped-def]
-    key = write_key(tmp_path / "linga.key")
+    key = write_key(tmp_path / "zyuka.key")
     df = pd.DataFrame(
         {
             "nrc": ["123456/78/1", "234567/89/2"],

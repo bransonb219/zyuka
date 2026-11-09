@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from linga.synthetic import ROUND_NAMES, SyntheticOptions, generate_round, write_rounds
+from zyuka.synthetic import ROUND_NAMES, SyntheticOptions, generate_round, write_rounds
 
 _NRC_RE = re.compile(r"^\d{6}/\d{2}/\d$")
 _PHONE_RE = re.compile(r"^09[67]\d{8}$")

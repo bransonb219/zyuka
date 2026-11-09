@@ -1,4 +1,4 @@
-"""Tests for linga.security.*."""
+"""Tests for zyuka.security.*."""
 
 from __future__ import annotations
 
@@ -8,10 +8,10 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from linga.errors import SecurityError
-from linga.security.audit import read_audit, verify_audit, write_entry
-from linga.security.crypto import decrypt_bytes, decrypt_file, encrypt_bytes, encrypt_file
-from linga.security.keys import (
+from zyuka.errors import SecurityError
+from zyuka.security.audit import read_audit, verify_audit, write_entry
+from zyuka.security.crypto import decrypt_bytes, decrypt_file, encrypt_bytes, encrypt_file
+from zyuka.security.keys import (
     Key,
     generate_key,
     load_key,
@@ -19,7 +19,7 @@ from linga.security.keys import (
     verify_fingerprint,
     write_key,
 )
-from linga.security.sanitize import (
+from zyuka.security.sanitize import (
     DANGEROUS_PREFIXES,
     check_file_size,
     check_safe_extension,
@@ -31,7 +31,7 @@ from linga.security.sanitize import (
 
 
 def test_write_and_load_plain_key(tmp_path: Path) -> None:
-    path = tmp_path / "linga.key"
+    path = tmp_path / "zyuka.key"
     key = write_key(path)
     loaded = load_key(path)
     assert loaded.material == key.material
@@ -89,7 +89,7 @@ def test_encrypt_decrypt_round_trip(tmp_path: Path) -> None:
     key = write_key(tmp_path / "k.key")
     plain = b"something sensitive" * 100
     blob = encrypt_bytes(plain, key)
-    assert blob[:6] == b"LINGA\x01"
+    assert blob[:6] == b"ZYUKA\x01"
     assert decrypt_bytes(blob, key) == plain
 
 
@@ -101,10 +101,10 @@ def test_decrypt_with_wrong_key_fails(tmp_path: Path) -> None:
         decrypt_bytes(blob, k2)
 
 
-def test_decrypt_rejects_non_linga_blob(tmp_path: Path) -> None:
+def test_decrypt_rejects_non_zyuka_blob(tmp_path: Path) -> None:
     key = write_key(tmp_path / "k.key")
     with pytest.raises(SecurityError):
-        decrypt_bytes(b"not linga", key)
+        decrypt_bytes(b"not zyuka", key)
 
 
 def test_encrypt_file_round_trip(tmp_path: Path) -> None:

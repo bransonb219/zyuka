@@ -1,19 +1,22 @@
 # Changelog
 
-All notable changes to Linga will be documented in this file.
+All notable changes to Zyuka will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] — 2026-11-08
+## [0.1.0] — 2026-11-09
 
 First public release.
+
+Released under **AGPL-3.0-or-later**. Commercial licensing available from the
+author on request.
 
 ### Added
 
 - **Scaffold**: packaging via `pyproject.toml` (hatchling), CI workflow,
-  pre-commit, synthetic 3-round dataset generator, `LingaConfig` /
-  `LogframeConfig` pydantic models, plain-language `LingaError` hierarchy.
+  pre-commit, synthetic 3-round dataset generator, `ZyukaConfig` /
+  `LogframeConfig` pydantic models, plain-language `ZyukaError` hierarchy.
 - **Ingest**: Kobo + ODK CSV / XLSX readers, XLSForm parser, multi-round
   loader that tags each dataset with its round.
 - **Quality**: duplicate detection by UUID and fuzzy identity, per-column
@@ -35,15 +38,15 @@ First public release.
 - **Reports**: single self-contained HTML report with inline SVG charts and
   print-friendly CSS; Excel IPTT workbook with per-round values, targets,
   percent of target, status, disaggregation sheets and metadata.
-- **Pipeline**: one-shot `linga run` orchestrating
-  check → scan → protect → compute → report → audit; `linga demo`
-  running the full pipeline on synthetic data; interactive `linga init`
+- **Pipeline**: one-shot `zyuka run` orchestrating
+  check → scan → protect → compute → report → audit; `zyuka demo`
+  running the full pipeline on synthetic data; interactive `zyuka init`
   wizard.
-- **Rights**: `linga subject find` / `erase` honouring access and
-  erasure requests via pseudonymised lookup; `linga retention check` /
+- **Rights**: `zyuka subject find` / `erase` honouring access and
+  erasure requests via pseudonymised lookup; `zyuka retention check` /
   `purge` for the configured retention window.
 - **Compliance**: DPIA starter in Markdown + HTML pre-filled from scan
-  results; `linga docs consent` reports and optionally filters
+  results; `zyuka docs consent` reports and optionally filters
   non-consenting rows.
 - **GUI**: local Streamlit app bound to `127.0.0.1` with telemetry off,
   masked previews on every page.

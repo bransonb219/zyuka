@@ -1,4 +1,4 @@
-"""Tests for linga.config."""
+"""Tests for zyuka.config."""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from linga.config import load_linga_config, load_logframe
-from linga.errors import ConfigError
+from zyuka.config import load_logframe, load_zyuka_config
+from zyuka.errors import ConfigError
 
 
 def _write(path: Path, text: str) -> Path:
@@ -15,9 +15,9 @@ def _write(path: Path, text: str) -> Path:
     return path
 
 
-def test_load_linga_config_happy_path(tmp_path: Path) -> None:
+def test_load_zyuka_config_happy_path(tmp_path: Path) -> None:
     yml = _write(
-        tmp_path / "linga.yml",
+        tmp_path / "zyuka.yml",
         """
 organisation: Example NGO
 programme: Test
@@ -26,15 +26,15 @@ retention_days: 365
 key_path: /tmp/example.key
 """.strip(),
     )
-    cfg = load_linga_config(yml)
+    cfg = load_zyuka_config(yml)
     assert cfg.organisation == "Example NGO"
     assert cfg.retention_days == 365
     assert cfg.protection.small_cell_threshold == 5
 
 
-def test_load_linga_config_blank_field_rejected(tmp_path: Path) -> None:
+def test_load_zyuka_config_blank_field_rejected(tmp_path: Path) -> None:
     yml = _write(
-        tmp_path / "linga.yml",
+        tmp_path / "zyuka.yml",
         """
 organisation: ""
 programme: Test
@@ -43,12 +43,12 @@ key_path: /tmp/example.key
 """.strip(),
     )
     with pytest.raises(ConfigError):
-        load_linga_config(yml)
+        load_zyuka_config(yml)
 
 
-def test_load_linga_config_missing_file(tmp_path: Path) -> None:
+def test_load_zyuka_config_missing_file(tmp_path: Path) -> None:
     with pytest.raises(ConfigError) as exc:
-        load_linga_config(tmp_path / "nope.yml")
+        load_zyuka_config(tmp_path / "nope.yml")
     assert "not found" in exc.value.message
     assert exc.value.suggest  # has a plain-language suggestion
 

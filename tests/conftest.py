@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from linga.synthetic import SyntheticOptions, generate_round, write_rounds
+from zyuka.synthetic import SyntheticOptions, generate_round, write_rounds
 
 
 @pytest.fixture(scope="session")

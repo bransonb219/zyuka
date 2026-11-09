@@ -6,7 +6,7 @@ Excel IPTT generated entirely on your laptop.
 ## 1. Install
 
 ```bash
-pipx install linga-me
+pipx install zyuka
 # or clone the repo and
 pip install -e ".[dev]"
 ```
@@ -16,16 +16,16 @@ Python 3.11+ is required. Works on Windows, macOS and Linux.
 ## 2. Try the demo
 
 ```bash
-linga demo --open
+zyuka demo --open
 ```
 
 This:
 
-1. Generates a synthetic 3-round dataset under `./linga-demo/data/`.
-2. Writes `linga.yml` and `logframe.yml` into `./linga-demo/`.
-3. Creates a project key under `./linga-demo/.linga-keys/demo.key`.
+1. Generates a synthetic 3-round dataset under `./zyuka-demo/data/`.
+2. Writes `zyuka.yml` and `logframe.yml` into `./zyuka-demo/`.
+3. Creates a project key under `./zyuka-demo/.zyuka-keys/demo.key`.
 4. Runs the full pipeline (check → scan → protect → compute → report).
-5. Opens `./linga-demo/outputs/report/report.html` in your browser.
+5. Opens `./zyuka-demo/outputs/report/report.html` in your browser.
 
 Nothing leaves your machine. The key file is stored outside the data
 directory and is never written into the report.
@@ -34,8 +34,8 @@ directory and is never written into the report.
 
 ```bash
 mkdir my-programme && cd my-programme
-linga init          # answer the interactive prompts
-linga key generate ~/.linga-keys/my-programme.key
+zyuka init          # answer the interactive prompts
+zyuka key generate ~/.zyuka-keys/my-programme.key
 ```
 
 Edit `logframe.yml` to describe your indicators (see
@@ -46,9 +46,9 @@ exports under `data/`, named like `survey_baseline.csv`,
 ## 4. Run the pipeline
 
 ```bash
-linga run --round baseline
-linga run --round midline
-linga run --round endline
+zyuka run --round baseline
+zyuka run --round midline
+zyuka run --round endline
 ```
 
 You can also pass `--encrypt` to produce `.enc` copies and `--open` to
@@ -57,7 +57,7 @@ automatically open the report.
 ## 5. Use the GUI
 
 ```bash
-linga gui
+zyuka gui
 ```
 
 Opens on `http://127.0.0.1:8501` only. The GUI shows masked previews only
@@ -68,16 +68,16 @@ and runs the same pipeline as the CLI.
 Every mutating step appends a hash-chained entry.
 
 ```bash
-linga audit show
-linga audit verify
+zyuka audit show
+zyuka audit verify
 ```
 
 ## 7. Honour subject rights
 
 ```bash
-linga subject find --id "100001/10/1"
-linga subject erase --id "100001/10/1"
+zyuka subject find --id "100001/10/1"
+zyuka subject erase --id "100001/10/1"
 ```
 
-Linga hashes the identifier with your project key before searching;
+Zyuka hashes the identifier with your project key before searching;
 the raw value never touches a protected file.

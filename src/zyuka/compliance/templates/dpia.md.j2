@@ -1,0 +1,54 @@
+# Data Protection Impact Assessment — {{ programme }}
+
+**Organisation:** {{ organisation }}
+**Data controller contact:** {{ data_controller }}
+**Generated:** {{ generated_at }} (Zyuka {{ version }})
+
+> This document is a *starter*. Zyuka can summarise what it sees in your data;
+> it cannot answer legal questions on your behalf. Review every section with
+> your organisation's data-protection officer before relying on it.
+
+## 1. Scope
+- Programme: {{ programme }}
+- Retention period configured: **{{ retention_days }} days**
+- Small-cell suppression threshold: **n < {{ small_cell }}**
+
+## 2. Nature of personal data processed
+
+PII scan summary:
+
+- High-risk columns: **{{ scan.counts.high }}**
+- Medium-risk columns: **{{ scan.counts.medium }}**
+- Low-risk columns: **{{ scan.counts.low }}**
+
+| Column | Risk | Signals | Suggested action |
+|---|---|---|---|
+{% for col in scan.columns -%}
+| `{{ col.name }}` | {{ col.risk }} | {{ col.signals | join(", ") }} | {{ col.action }} |
+{% endfor %}
+
+## 3. Necessity and proportionality
+
+- [ ] Describe the lawful basis under the Zambia Data Protection Act No. 3 of 2021.
+- [ ] Confirm consent is collected before data entry (`zyuka docs consent` can help).
+- [ ] State who may access the protected datasets and why.
+
+## 4. Risks and mitigations
+
+| Risk | Current mitigation |
+|---|---|
+| Direct identification | Identifier columns pseudonymised (HMAC-SHA256) |
+| Linkage across rounds | Same key reused; keys stored outside the repo |
+| Reconstruction of small groups | Cells with n < {{ small_cell }} suppressed in reports |
+| Unauthorised access | AES-GCM encryption available via `--encrypt` |
+
+## 5. Outstanding actions
+
+- [ ] Register with the Data Protection Commissioner if required.
+- [ ] Document breach-notification procedure (72 hours).
+- [ ] Set a review date for this DPIA.
+
+---
+
+*Zyuka enables compliance; it does not provide it. The organisation remains the
+data controller.*

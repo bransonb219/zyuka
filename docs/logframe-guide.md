@@ -1,6 +1,6 @@
 # Logframe guide
 
-A Linga `logframe.yml` describes what you want to measure. The indicator
+A Zyuka `logframe.yml` describes what you want to measure. The indicator
 engine reads this file, validates it against your data, and produces per-
 round values with longitudinal change and traffic-light status.
 
@@ -88,10 +88,10 @@ to a status:
 | ≥ `at_risk` (default 50) | `at_risk` |
 | otherwise | `off_track` |
 
-Thresholds are configurable under `traffic_light:` in `linga.yml`.
+Thresholds are configurable under `traffic_light:` in `zyuka.yml`.
 
 ## Validation
 
-`linga compute` validates the logframe against your data before computing
+`zyuka compute` validates the logframe against your data before computing
 anything. Missing columns raise plain-language errors with a "did you
 mean?" suggestion powered by `difflib`.

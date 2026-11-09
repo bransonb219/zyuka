@@ -1,13 +1,13 @@
 # GUI guide
 
-The Linga GUI is a local Streamlit app. It is launched by the CLI and
+The Zyuka GUI is a local Streamlit app. It is launched by the CLI and
 binds to `127.0.0.1` only — it cannot be reached from another machine.
 Telemetry is disabled both in the CLI launcher and inside the app.
 
 ## Launch
 
 ```bash
-linga gui
+zyuka gui
 ```
 
 Opens on `http://127.0.0.1:8501`. Close the terminal window to shut it
@@ -17,7 +17,7 @@ down.
 
 ### Home
 
-Shows the project directory and whether `linga.yml` is present. Reminds
+Shows the project directory and whether `zyuka.yml` is present. Reminds
 you that nothing leaves your machine and that raw PII is never shown in
 the GUI.
 
@@ -66,7 +66,7 @@ touches disk. Erasure requires ticking a confirmation box.
 - The CLI launcher sets `--browser.gatherUsageStats false` and
   `--server.address 127.0.0.1`.
 - The app additionally calls `st.set_option("browser.gatherUsageStats",
-  False)` so a developer running `streamlit run src/linga/gui/app.py`
+  False)` so a developer running `streamlit run src/zyuka/gui/app.py`
   still gets telemetry off.
 - Any column whose name hints at PII (`name`, `nrc`, `phone`, `email`,
   `address`, `gps`, `lat`, `lon`, `dob`, `birth`, `notes`, …) is masked

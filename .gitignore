@@ -1,13 +1,13 @@
-# Linga-specific — never commit real or working data
+# Zyuka-specific — never commit real or working data
 CLAUDE.md
 .claude/
 .claude:settings.json
 data/
 outputs/
-linga-demo/
+zyuka-demo/
 *.key
 *.enc
-.linga/
+.zyuka/
 
 # Python
 __pycache__/

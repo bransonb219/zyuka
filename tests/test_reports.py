@@ -1,4 +1,4 @@
-"""Tests for linga.reports.*."""
+"""Tests for zyuka.reports.*."""
 
 from __future__ import annotations
 
@@ -8,11 +8,11 @@ from pathlib import Path
 import pandas as pd
 from openpyxl import load_workbook
 
-from linga.reports.charts import disaggregation_chart, trend_chart
-from linga.reports.excel import render_excel
-from linga.reports.html import render_html
-from linga.reports.pipeline import render_report
-from linga.reports.summary import build_summary
+from zyuka.reports.charts import disaggregation_chart, trend_chart
+from zyuka.reports.excel import render_excel
+from zyuka.reports.html import render_html
+from zyuka.reports.pipeline import render_report
+from zyuka.reports.summary import build_summary
 
 SAMPLE_RESULTS = {
     "rounds": ["baseline", "midline", "endline"],

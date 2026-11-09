@@ -32,7 +32,7 @@ jobs:
       - name: Mypy
         run: mypy src
       - name: Tests
-        run: pytest --cov=linga --cov-report=term-missing
+        run: pytest --cov=zyuka --cov-report=term-missing
       - name: Bandit
         run: bandit -q -r src
       - name: pip-audit

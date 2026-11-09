@@ -1,10 +1,10 @@
-# Linga — Privacy-first M&E Toolkit
+# Zyuka — Privacy-first M&E Toolkit
 
-> *Linga* (chiTonga / chiNyanja): a protective stockade or fortress. Linga guards
-> beneficiary data while turning raw survey exports into clean data, indicators
-> and donor-ready reports.
+> **Zyuka** (pronounced *zyoo-KAH*) — from *Chizyuka*, a Tonga name borne by the
+> author. The toolkit guards beneficiary data while turning raw survey exports
+> into clean data, indicators and donor-ready reports.
 
-Linga is an **open-source, local-first** Monitoring & Evaluation toolkit for
+Zyuka is an **open-source, local-first** Monitoring & Evaluation toolkit for
 NGOs, government programmes and researchers in Zambia and the region. It:
 
 - Runs locally. No server, no uploads, no telemetry, no CDN assets.
@@ -16,33 +16,33 @@ NGOs, government programmes and researchers in Zambia and the region. It:
 - Helps organisations comply with Zambia's **Data Protection Act No. 3 of 2021**
   and follow good practice under the **Cyber Security Act No. 3 of 2025**.
 
-**Honest positioning.** Linga *enables* compliance. Your organisation remains
+**Honest positioning.** Zyuka *enables* compliance. Your organisation remains
 the data controller. See [docs/data-protection.md](docs/data-protection.md).
 
 ## Install
 
 ```bash
-pipx install linga-me
+pipx install zyuka
 # or, for development
 pip install -e ".[dev]"
 ```
 
-Linga requires Python 3.11+. It works on Windows, macOS and Linux.
+Zyuka requires Python 3.11+. It works on Windows, macOS and Linux.
 
 ## Quick start
 
 ```bash
 # Try the full pipeline on synthetic data
-linga demo --open
+zyuka demo --open
 
 # Initialise a project in the current folder
-linga init
+zyuka init
 
 # Run the full pipeline on your own survey exports
-linga run --round baseline
+zyuka run --round baseline
 
 # Local Streamlit GUI (localhost only)
-linga gui
+zyuka gui
 ```
 
 See [docs/quickstart.md](docs/quickstart.md) for the full walkthrough.
@@ -83,7 +83,7 @@ check  →  scan  →  protect  →  compute  →  report  →  audit
 ## Repository layout
 
 ```
-src/linga/
+src/zyuka/
   ingest/      kobo.py odk.py xlsform.py rounds.py
   quality/     duplicates.py missing.py outliers.py constraints.py ...
   privacy/     patterns.py scanner.py pseudonymise.py minimise.py ...
@@ -102,7 +102,7 @@ src/linga/
 pip install -e ".[dev]"
 pre-commit install
 
-pytest --cov=linga
+pytest --cov=zyuka
 ruff check . && ruff format --check .
 mypy src
 bandit -q -r src
@@ -117,4 +117,20 @@ Branson Bazungu — <bbazungu@gmail.com>
 
 ## Licence
 
-Apache-2.0. See [LICENSE](LICENSE).
+Zyuka is released under the **GNU Affero General Public License v3.0 or later**
+(AGPL-3.0-or-later). See [LICENSE](LICENSE) for the full text.
+
+Copyright © 2026 Branson Bazungu.
+
+### What AGPL-3.0 means for you
+
+- **NGOs, researchers, public-sector programmes, individuals:** free to use,
+  modify and self-host Zyuka without restriction, provided derivative works
+  and network-service deployments publish their source under the same licence.
+- **Commercial / proprietary use:** if AGPL-3.0's copyleft reach-through is
+  incompatible with your product or hosted service, a **commercial licence** is
+  available from the author. Contact <bbazungu@gmail.com>.
+
+The author retains the right to re-license this code under commercial terms;
+contributions by third parties are accepted under the same AGPL-3.0-or-later
+licence unless a Contributor Licence Agreement is signed.

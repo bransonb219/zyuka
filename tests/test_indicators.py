@@ -1,18 +1,18 @@
-"""Tests for linga.indicators.*."""
+"""Tests for zyuka.indicators.*."""
 
 from __future__ import annotations
 
 import pandas as pd
 import pytest
 
-from linga.config import IndicatorDef, LogframeConfig, OutcomeDef, TrafficLightThresholds
-from linga.errors import IndicatorError
-from linga.indicators.disaggregate import disaggregate_indicator
-from linga.indicators.engine import compute_indicator
-from linga.indicators.expressions import evaluate, parse_expression, referenced_columns
-from linga.indicators.longitudinal import build_series
-from linga.indicators.pipeline import compute_from_rounds
-from linga.indicators.validate import validate_logframe
+from zyuka.config import IndicatorDef, LogframeConfig, OutcomeDef, TrafficLightThresholds
+from zyuka.errors import IndicatorError
+from zyuka.indicators.disaggregate import disaggregate_indicator
+from zyuka.indicators.engine import compute_indicator
+from zyuka.indicators.expressions import evaluate, parse_expression, referenced_columns
+from zyuka.indicators.longitudinal import build_series
+from zyuka.indicators.pipeline import compute_from_rounds
+from zyuka.indicators.validate import validate_logframe
 
 # ---- safe expression parser -------------------------------------------------
 
@@ -147,7 +147,7 @@ def test_disaggregate_by_sex() -> None:
 
 
 def test_build_series_computes_change_and_status() -> None:
-    from linga.indicators.engine import IndicatorValue
+    from zyuka.indicators.engine import IndicatorValue
 
     ind = _ind(
         type="count",
@@ -188,7 +188,7 @@ def test_validate_catches_missing_column_with_suggestion() -> None:
 
 
 def test_compute_from_rounds_runs_on_synthetic() -> None:
-    from linga.synthetic import SyntheticOptions, generate_round
+    from zyuka.synthetic import SyntheticOptions, generate_round
 
     rounds = {
         "baseline": generate_round("baseline", SyntheticOptions(rows_per_round=50, seed=1)),

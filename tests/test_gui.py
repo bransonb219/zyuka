@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from linga.gui.mask import _mask_value, masked_preview
+from zyuka.gui.mask import _mask_value, masked_preview
 
 
 def test_mask_value_hides_middle() -> None:
@@ -44,7 +44,7 @@ def test_gui_pages_parse_and_compile() -> None:
     bad imports without needing a server.
     """
 
-    pages_dir = Path("src/linga/gui/pages")
+    pages_dir = Path("src/zyuka/gui/pages")
     assert pages_dir.is_dir()
     for page in sorted(pages_dir.glob("*.py")):
         source = page.read_text(encoding="utf-8")
@@ -52,6 +52,6 @@ def test_gui_pages_parse_and_compile() -> None:
 
 
 def test_gui_app_parses_and_compiles() -> None:
-    app_path = Path("src/linga/gui/app.py")
+    app_path = Path("src/zyuka/gui/app.py")
     source = app_path.read_text(encoding="utf-8")
     compile(source, str(app_path), "exec")

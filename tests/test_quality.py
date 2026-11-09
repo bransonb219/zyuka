@@ -1,17 +1,17 @@
-"""Tests for linga.quality.*."""
+"""Tests for zyuka.quality.*."""
 
 from __future__ import annotations
 
 import pandas as pd
 
-from linga.ingest.xlsform import Question, XLSForm
-from linga.quality.duplicates import duplicate_identity, duplicate_uuids
-from linga.quality.duration import find_duration_issues
-from linga.quality.enumerators import enumerator_summary
-from linga.quality.missing import missing_per_column, missing_per_enumerator
-from linga.quality.outliers import find_outliers, iqr_outliers, zscore_outliers
-from linga.quality.report import run_quality
-from linga.synthetic import SyntheticOptions, generate_round
+from zyuka.ingest.xlsform import Question, XLSForm
+from zyuka.quality.duplicates import duplicate_identity, duplicate_uuids
+from zyuka.quality.duration import find_duration_issues
+from zyuka.quality.enumerators import enumerator_summary
+from zyuka.quality.missing import missing_per_column, missing_per_enumerator
+from zyuka.quality.outliers import find_outliers, iqr_outliers, zscore_outliers
+from zyuka.quality.report import run_quality
+from zyuka.synthetic import SyntheticOptions, generate_round
 
 
 def test_duplicate_uuids() -> None:

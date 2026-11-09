@@ -1,4 +1,4 @@
-"""Tests for linga.ingest.* on synthetic fixtures only."""
+"""Tests for zyuka.ingest.* on synthetic fixtures only."""
 
 from __future__ import annotations
 
@@ -8,16 +8,16 @@ import pandas as pd
 import pytest
 from openpyxl import Workbook
 
-from linga.errors import IngestError
-from linga.ingest.kobo import (
+from zyuka.errors import IngestError
+from zyuka.ingest.kobo import (
     normalise_select_multiple,
     read_kobo_csv,
     read_kobo_xlsx,
     strip_group_prefixes,
 )
-from linga.ingest.odk import read_odk_csv
-from linga.ingest.rounds import load_round, load_rounds, read_table
-from linga.ingest.xlsform import UnsupportedExpression, parse_xlsform, translate_expression
+from zyuka.ingest.odk import read_odk_csv
+from zyuka.ingest.rounds import load_round, load_rounds, read_table
+from zyuka.ingest.xlsform import UnsupportedExpression, parse_xlsform, translate_expression
 
 
 def _write_csv(path: Path, df: pd.DataFrame) -> Path:

@@ -1,4 +1,4 @@
-"""Tests for linga.rights.* and linga.compliance.*."""
+"""Tests for zyuka.rights.* and zyuka.compliance.*."""
 
 from __future__ import annotations
 
@@ -9,13 +9,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from linga.commands.init import _LINGA_YML_TEMPLATE, _LOGFRAME_YML_TEMPLATE
-from linga.compliance.consent import check_consent
-from linga.compliance.dpia import render_dpia
-from linga.privacy.pseudonymise import pseudonymise_value
-from linga.rights.retention import list_expired, purge_expired
-from linga.rights.subject import erase_subject, find_subject
-from linga.security.keys import generate_key, load_key
+from zyuka.commands.init import _LOGFRAME_YML_TEMPLATE, _ZYUKA_YML_TEMPLATE
+from zyuka.compliance.consent import check_consent
+from zyuka.compliance.dpia import render_dpia
+from zyuka.privacy.pseudonymise import pseudonymise_value
+from zyuka.rights.retention import list_expired, purge_expired
+from zyuka.rights.subject import erase_subject, find_subject
+from zyuka.security.keys import generate_key, load_key
 
 
 def _project(tmp_path: Path, retention_days: int = 1825) -> tuple[Path, Path]:
@@ -23,12 +23,12 @@ def _project(tmp_path: Path, retention_days: int = 1825) -> tuple[Path, Path]:
 
     project_dir = tmp_path / "proj"
     project_dir.mkdir()
-    key_path = tmp_path / ".linga-keys" / "proj.key"
+    key_path = tmp_path / ".zyuka-keys" / "proj.key"
     key_path.parent.mkdir(parents=True, exist_ok=True)
     generate_key(key_path)
 
-    (project_dir / "linga.yml").write_text(
-        _LINGA_YML_TEMPLATE.format(
+    (project_dir / "zyuka.yml").write_text(
+        _ZYUKA_YML_TEMPLATE.format(
             organisation="Demo NGO",
             programme="Demo",
             data_controller="dpo@example.org",
@@ -90,7 +90,7 @@ def test_erase_subject_removes_rows_and_audits(tmp_path: Path) -> None:
     remaining = pd.read_csv(data_dir / "protected_baseline.csv")
     assert len(remaining) == 2
     # Raw identifier never appears in the audit log
-    audit = (project_dir / ".linga" / "audit.jsonl").read_text(encoding="utf-8")
+    audit = (project_dir / ".zyuka" / "audit.jsonl").read_text(encoding="utf-8")
     assert "B/2/2" not in audit
     assert "subject.erase" in audit
 
@@ -119,11 +119,11 @@ def test_retention_refuses_to_delete_outside_project(tmp_path: Path) -> None:
     outsider = tmp_path / "not-in-project.csv"
     outsider.write_text("a", encoding="utf-8")
 
-    from linga.errors import LingaError
+    from zyuka.errors import ZyukaError
 
     try:
         purge_expired(project_dir, [outsider])
-    except LingaError as exc:
+    except ZyukaError as exc:
         assert "outside" in str(exc.message)
     else:
         raise AssertionError("purge_expired did not refuse an outsider path")
