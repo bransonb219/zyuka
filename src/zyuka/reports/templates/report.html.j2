@@ -106,9 +106,100 @@
           <img alt="{{ ind.code|e }} by {{ col|e }}" src="{{ chart }}">
         {% endfor %}
       </div>
+
+      {% set ev = ind.evaluation %}
+      {% if ev %}
+        {% if ev.confidence_intervals %}
+          <h4>Confidence intervals</h4>
+          <table>
+            <thead><tr><th>Round</th><th>Lower (95%)</th><th>Upper (95%)</th></tr></thead>
+            <tbody>
+              {% for round_name, interval in ev.confidence_intervals.items() %}
+                <tr>
+                  <td>{{ round_name|e }}</td>
+                  <td>{{ "%.3f"|format(interval.lower) }}</td>
+                  <td>{{ "%.3f"|format(interval.upper) }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+
+        {% if ev.equity_gaps %}
+          <h4>Equity gap by disaggregation</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Round</th><th>Disaggregation</th>
+                <th>Best</th><th>Worst</th><th>Gap</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for round_name, gaps in ev.equity_gaps.items() %}
+                {% for col, gap in gaps.items() %}
+                  <tr>
+                    <td>{{ round_name|e }}</td>
+                    <td>{{ col|e }}</td>
+                    <td>{{ gap.best_group|e }} ({{ "%.3f"|format(gap.best_value) }})</td>
+                    <td>{{ gap.worst_group|e }} ({{ "%.3f"|format(gap.worst_value) }})</td>
+                    <td>{{ "%.3f"|format(gap.gap) }}</td>
+                  </tr>
+                {% endfor %}
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+
+        {% if ev.trajectory %}
+          <p class="meta">
+            Trajectory: slope = {{ "%+.3f"|format(ev.trajectory.slope_per_round) }} per round;
+            next-round projection = {{ "%.3f"|format(ev.trajectory.next_round_projection) }}
+            {% if ev.trajectory.rounds_to_target is defined %}
+              · rounds to target = {{ "%.1f"|format(ev.trajectory.rounds_to_target) }}
+            {% endif %}
+          </p>
+        {% endif %}
+
+        {% if ev.pre_post %}
+          <p class="meta">
+            Pre/post: Δ = {{ "%+.3f"|format(ev.pre_post.diff) }} —
+            p = {{ "%.4f"|format(ev.pre_post.p_value) }}
+            {% if ev.pre_post.p_value < 0.05 %}(significant at α=0.05){% else %}(not significant at α=0.05){% endif %}.
+          </p>
+        {% endif %}
+
+        {% if ev.means_of_verification %}
+          <p class="meta"><strong>Means of verification:</strong> {{ ev.means_of_verification|e }}</p>
+        {% endif %}
+
+        {% if ev.assumptions %}
+          <p class="meta"><strong>Assumptions:</strong></p>
+          <ul>
+            {% for a in ev.assumptions %}<li>{{ a|e }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      {% endif %}
     </div>
   {% endfor %}
 </section>
+
+{% if oecd_dac %}
+<section>
+  <h2>OECD-DAC evaluation criteria</h2>
+  <table>
+    <tbody>
+      {% for criterion in ["relevance", "coherence", "effectiveness", "efficiency", "impact", "sustainability"] %}
+        {% if oecd_dac.get(criterion) %}
+          <tr>
+            <th style="width: 18%;">{{ criterion|capitalize }}</th>
+            <td>{{ oecd_dac[criterion]|e }}</td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
 
 {% if warehouse %}
 <section>

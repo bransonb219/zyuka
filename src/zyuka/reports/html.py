@@ -76,6 +76,7 @@ def render_html(
         "quality": quality,
         "small_cell_threshold": small_cell_threshold,
         "warehouse": warehouse_comparison,
+        "oecd_dac": results.get("oecd_dac") or {},
     }
     html = _render(context)
     out_path = Path(out_path)

@@ -34,6 +34,7 @@ class IndicatorValue:
     numerator: int | None
     denominator: int | None
     note: str = ""
+    std: float | None = None
 
 
 def _row_mask(df: pd.DataFrame, expression: str) -> pd.Series:
@@ -132,6 +133,7 @@ def compute_indicator(df: pd.DataFrame, indicator: IndicatorDef) -> IndicatorVal
         if math.isnan(result):
             return IndicatorValue(indicator.code, indicator.type, None, 0, None)
         n = len(values)
-        return IndicatorValue(indicator.code, indicator.type, result, n, n)
+        std = float(values.std(ddof=1)) if n > 1 and indicator.type == "mean" else None
+        return IndicatorValue(indicator.code, indicator.type, result, n, n, std=std)
 
     raise IndicatorError(f"Unknown indicator type: {indicator.type!r}")

@@ -93,6 +93,8 @@ class IndicatorDef(BaseModel):
     unit: str = ""
     data_source: str = ""
     frequency: str = ""
+    means_of_verification: str = ""
+    assumptions: list[str] = Field(default_factory=list)
 
 
 class OutputDef(BaseModel):
@@ -112,6 +114,32 @@ class OutcomeDef(BaseModel):
     outputs: list[OutputDef] = Field(default_factory=list)
 
 
+class OECDDACBlock(BaseModel):
+    """Narrative notes against the six OECD-DAC evaluation criteria."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    relevance: str = ""
+    coherence: str = ""
+    effectiveness: str = ""
+    efficiency: str = ""
+    impact: str = ""
+    sustainability: str = ""
+
+    def is_empty(self) -> bool:
+        return not any(
+            getattr(self, name).strip()
+            for name in (
+                "relevance",
+                "coherence",
+                "effectiveness",
+                "efficiency",
+                "impact",
+                "sustainability",
+            )
+        )
+
+
 class LogframeConfig(BaseModel):
     """Full logframe tree."""
 
@@ -120,6 +148,7 @@ class LogframeConfig(BaseModel):
     goal: str
     goal_indicators: list[IndicatorDef] = Field(default_factory=list)
     outcomes: list[OutcomeDef] = Field(default_factory=list)
+    oecd_dac: OECDDACBlock = Field(default_factory=OECDDACBlock)
 
     def all_indicators(self) -> list[IndicatorDef]:
         out: list[IndicatorDef] = list(self.goal_indicators)
