@@ -636,6 +636,14 @@ def run_many(df: pd.DataFrame, suggestions: Iterable[Mapping[str, Any]]) -> list
     names are skipped silently so the UI can stay forward-compatible.
     """
 
+    from zyuka.analysis.modelling import (
+        breusch_pagan_heteroskedasticity,
+        classify_with_cv,
+        principal_components,
+        profile_clusters,
+        variance_inflation_factors,
+    )
+
     dispatch = {
         "normality": lambda s: normality_test(df, s["columns"][0]),
         "pearson": lambda s: pearson_correlation(df, s["columns"][0], s["columns"][1]),
@@ -649,6 +657,13 @@ def run_many(df: pd.DataFrame, suggestions: Iterable[Mapping[str, Any]]) -> list
         "ols": lambda s: ordinary_least_squares(df, s["columns"][0], s["columns"][1:]),
         "covariance": lambda s: sample_covariance(df, s["columns"]),
         "kmeans": lambda s: kmeans_cluster(df, s["columns"]),
+        "pca": lambda s: principal_components(df, s["columns"]),
+        "vif": lambda s: variance_inflation_factors(df, s["columns"]),
+        "breusch_pagan": lambda s: breusch_pagan_heteroskedasticity(
+            df, s["columns"][0], s["columns"][1:]
+        ),
+        "classifier": lambda s: classify_with_cv(df, s["columns"][0], s["columns"][1:]),
+        "cluster_profile": lambda s: profile_clusters(df, s["columns"]),
     }
     results: list[AnalysisResult] = []
     for suggestion in suggestions:

@@ -103,6 +103,8 @@ def suggest_analyses(
     out.extend(_association_suggestions(df, cat_cols))
     out.extend(_regression_suggestions(numeric_cols))
     out.extend(_clustering_suggestions(numeric_cols))
+    out.extend(_dimensionality_suggestions(numeric_cols))
+    out.extend(_classification_suggestions(numeric_cols, cat_cols, df))
 
     out.sort(key=lambda s: s.confidence, reverse=True)
     return out
@@ -349,7 +351,7 @@ def _clustering_suggestions(numeric: Sequence[ColumnProfile]) -> list[AnalysisSu
     cols = [c.name for c in numeric if c.n - c.missing >= MIN_N]
     if len(cols) < 2:
         return []
-    return [
+    out: list[AnalysisSuggestion] = [
         AnalysisSuggestion(
             test="kmeans",
             name=f"K-means clustering ({len(cols)} features)",
@@ -363,3 +365,88 @@ def _clustering_suggestions(numeric: Sequence[ColumnProfile]) -> list[AnalysisSu
             confidence=0.45,
         )
     ]
+    if len(cols) >= 3:
+        out.append(
+            AnalysisSuggestion(
+                test="cluster_profile",
+                name=f"Cluster profiling (k=3, {len(cols)} features)",
+                columns=cols[:8],
+                category="Segmentation",
+                rationale="Companion to K-means: describes each cluster in original units.",
+                explanation=(
+                    "Fits k=3 and reports per-cluster feature means and cluster sizes so you can "
+                    "label each cluster meaningfully (e.g. 'low-income urban youth')."
+                ),
+                confidence=0.4,
+            )
+        )
+    return out
+
+
+def _dimensionality_suggestions(
+    numeric: Sequence[ColumnProfile],
+) -> list[AnalysisSuggestion]:
+    cols = [c.name for c in numeric if c.n - c.missing >= MIN_N]
+    if len(cols) < 4:
+        return []
+    return [
+        AnalysisSuggestion(
+            test="pca",
+            name=f"Principal component analysis ({len(cols)} features)",
+            columns=cols[:12],
+            category="Dimensionality",
+            rationale=f"{len(cols)} numeric columns — PCA can reveal latent structure.",
+            explanation=(
+                "Scales features then fits PCA. Reports how many components reach 90% of "
+                "variance, plus loadings so you can interpret each component."
+            ),
+            confidence=0.5,
+        ),
+        AnalysisSuggestion(
+            test="vif",
+            name=f"Variance Inflation Factors ({len(cols)} predictors)",
+            columns=cols[:8],
+            category="Dimensionality",
+            rationale="Check if numeric predictors are collinear before OLS.",
+            explanation=(
+                "A VIF above 10 means a predictor is well-explained by the others, which inflates "
+                "OLS standard errors. Drop or combine such columns before fitting a model."
+            ),
+            confidence=0.48,
+        ),
+    ]
+
+
+def _classification_suggestions(
+    numeric: Sequence[ColumnProfile],
+    categorical: Sequence[ColumnProfile],
+    df: pd.DataFrame,
+) -> list[AnalysisSuggestion]:
+    binary_cats = [c for c in categorical if 2 <= c.unique <= 2 and c.name in df.columns]
+    predictors = [c.name for c in numeric if c.n - c.missing >= MIN_N]
+    if not binary_cats or len(predictors) < 2:
+        return []
+    out: list[AnalysisSuggestion] = []
+    for outcome in binary_cats[:3]:
+        counts = df[outcome.name].dropna().value_counts()
+        minority = int(counts.min()) if not counts.empty else 0
+        if minority < 10:
+            continue
+        out.append(
+            AnalysisSuggestion(
+                test="classifier",
+                name=f"Classifier — predict {outcome.name}",
+                columns=[outcome.name, *predictors[:6]],
+                category="Modelling",
+                rationale=(
+                    f"Binary outcome with minority class n={minority} and "
+                    f"{len(predictors[:6])} numeric predictors."
+                ),
+                explanation=(
+                    "Fits logistic regression and a random forest with 5-fold CV. "
+                    "Reports ROC AUC when the outcome is binary."
+                ),
+                confidence=0.5,
+            )
+        )
+    return out

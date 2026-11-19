@@ -21,6 +21,13 @@ from __future__ import annotations
 
 from zyuka.analysis.advisor import AnalysisSuggestion, suggest_analyses
 from zyuka.analysis.eda import ColumnProfile, DatasetProfile, profile_dataframe
+from zyuka.analysis.modelling import (
+    breusch_pagan_heteroskedasticity,
+    classify_with_cv,
+    principal_components,
+    profile_clusters,
+    variance_inflation_factors,
+)
 from zyuka.analysis.tests import (
     AnalysisResult,
     cronbach_alpha,
@@ -43,6 +50,8 @@ __all__ = [
     "AnalysisSuggestion",
     "ColumnProfile",
     "DatasetProfile",
+    "breusch_pagan_heteroskedasticity",
+    "classify_with_cv",
     "cronbach_alpha",
     "kmeans_cluster",
     "kruskal_wallis",
@@ -52,10 +61,13 @@ __all__ = [
     "ordinary_least_squares",
     "pairwise_correlations",
     "pearson_correlation",
+    "principal_components",
+    "profile_clusters",
     "profile_dataframe",
     "sample_covariance",
     "spearman_correlation",
     "suggest_analyses",
     "t_test_independent",
     "two_way_chi_square",
+    "variance_inflation_factors",
 ]
