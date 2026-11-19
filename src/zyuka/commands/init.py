@@ -33,7 +33,7 @@ traffic_light:
   on_track: 80.0
   at_risk: 50.0
 
-consent_column: "demographics/consent"
+consent_column: "consent"
 """
 
 _LOGFRAME_YML_TEMPLATE = """# logframe.yml — logframe for your programme.
@@ -55,7 +55,7 @@ outcomes:
       - code: "OC1.1"
         name: "Proportion with an income source"
         type: "proportion"
-        numerator: "livelihoods/has_income_source == 'yes'"
+        numerator: "has_income_source == 'yes'"
         denominator: "pid_seed != ''"
         disaggregations: ["sex"]
         targets: { baseline: 0.4, midline: 0.6, endline: 0.75 }
@@ -66,7 +66,7 @@ outcomes:
           - code: "OP1.1.1"
             name: "People trained"
             type: "count"
-            numerator: "training/attended == 'yes'"
+            numerator: "attended == 'yes'"
             disaggregations: ["sex", "province"]
             targets: { baseline: 50, midline: 150, endline: 300 }
 """

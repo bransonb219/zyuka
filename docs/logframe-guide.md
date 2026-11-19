@@ -24,7 +24,7 @@ outcomes:
       - code: "OC1.1"
         name: "Proportion with an income source"
         type: "proportion"
-        numerator: "livelihoods/has_income_source == 'yes'"
+        numerator: "has_income_source == 'yes'"
         denominator: "pid_seed != ''"
         targets: { baseline: 0.4, midline: 0.6, endline: 0.75 }
     outputs:
@@ -34,7 +34,7 @@ outcomes:
           - code: "OP1.1.1"
             name: "People trained"
             type: "count"
-            numerator: "training/attended == 'yes'"
+            numerator: "attended == 'yes'"
             targets: { baseline: 50, midline: 150, endline: 300 }
 ```
 
@@ -55,7 +55,9 @@ outcomes:
 Numerator and denominator are evaluated by a **safe parser**. No `eval`,
 no `exec`. The allowed syntax is:
 
-- Column references by name: `age`, `livelihoods/has_income_source`.
+- Column references by name: `age`, `has_income_source`. Group
+  prefixes (`livelihoods/...`) are stripped on ingest, so refer to
+  the leaf column name.
 - Comparison operators: `==`, `!=`, `<`, `<=`, `>`, `>=`.
 - Boolean logic: `and`, `or`, `not`.
 - Literals: numbers, strings, booleans, `None`.

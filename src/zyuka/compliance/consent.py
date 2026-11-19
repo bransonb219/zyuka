@@ -20,6 +20,7 @@ import pandas as pd
 
 from zyuka.config import load_zyuka_config
 from zyuka.errors import ZyukaError
+from zyuka.ingest.kobo import strip_group_prefixes
 
 POSITIVE_VALUES: frozenset[str] = frozenset({"yes", "y", "true", "1", "consent"})
 
@@ -70,7 +71,7 @@ def check_consent(
         )
     cfg = load_zyuka_config(cfg_path)
 
-    df = pd.read_csv(data_path)
+    df = strip_group_prefixes(pd.read_csv(data_path))
     column = cfg.consent_column
     if column is None or column not in df.columns:
         return ConsentReport(
