@@ -2,33 +2,67 @@
 
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
-
 import pandas as pd
 import streamlit as st
 
-from zyuka.ingest.rounds import read_table
+from zyuka.errors import ZyukaError
+from zyuka.gui.components import empty_state, init_page, project_guard
 from zyuka.privacy.scanner import scan_dataframe
 
-st.title("Privacy scan")
+paths = init_page("Privacy scan")
+if not project_guard(paths):
+    st.stop()
 
-uploaded = st.file_uploader("Dataset (CSV/XLSX)", type=["csv", "xlsx"], key="scan_upload")
+st.caption(
+    "Flags each column as high/medium/low risk using name and value heuristics "
+    "(NRC, phone, email, GPS, DOB, sensitive attributes)."
+)
 
-if uploaded is not None:
-    tmp_dir = Path(tempfile.mkdtemp(prefix="zyuka-gui-"))
-    tmp = tmp_dir / uploaded.name
-    tmp.write_bytes(uploaded.read())
-    df = read_table(tmp)
-    report = scan_dataframe(df)
+df = st.session_state.get("uploaded_df")
+if df is None:
+    empty_state(
+        "No dataset loaded.",
+        "Go to <strong>Upload & Quality</strong> and bring in a CSV/XLSX first. "
+        "The scan runs on the same in-memory dataset — no need to upload twice.",
+    )
+    st.stop()
+
+st.markdown(
+    f"Scanning **{st.session_state.get('uploaded_name', 'dataset')}** "
+    f"({len(df):,} rows, {df.shape[1]:,} columns)."
+)
+
+if st.button("Run privacy scan", type="primary"):
+    try:
+        report = scan_dataframe(df)
+    except ZyukaError as exc:
+        st.error(exc.message)
+        st.stop()
 
     rows = [
         {
-            "column": col.name,
-            "risk": col.risk,
-            "signals": ", ".join(col.signals),
-            "suggested_action": col.suggested_action,
+            "Column": col.name,
+            "Risk": col.risk,
+            "Signals": ", ".join(col.signals),
+            "Suggested action": col.suggested_action,
         }
         for col in report.columns
     ]
-    st.dataframe(pd.DataFrame(rows), use_container_width=True)
+    scan_df = pd.DataFrame(rows)
+
+    by_risk = scan_df["Risk"].value_counts().to_dict() if not scan_df.empty else {}
+    c1, c2, c3 = st.columns(3)
+    c1.metric("High risk", by_risk.get("high", 0))
+    c2.metric("Medium risk", by_risk.get("medium", 0))
+    c3.metric("Low risk", by_risk.get("low", 0))
+
+    st.subheader("Columns")
+    st.dataframe(scan_df, use_container_width=True, hide_index=True)
+
+    if by_risk.get("high", 0) > 0:
+        st.warning(
+            "High-risk columns were found. Visit the **Protect** page to "
+            "pseudonymise and generalise them before sharing or storing."
+        )
+    else:
+        st.success("No high-risk columns detected.")

@@ -2,47 +2,82 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import streamlit as st
 
+from zyuka.errors import ZyukaError
+from zyuka.gui.components import empty_state, init_page, project_guard
 from zyuka.rights.subject import erase_subject, find_subject
 
-st.title("Subject requests")
+paths = init_page("Subject requests")
+if not project_guard(paths):
+    st.stop()
 
-project = st.text_input("Project directory", value=str(Path.cwd()), key="subj_project")
-data_dir = st.text_input(
-    "Protected data directory",
-    value=str(Path(project) / "outputs" / "protected"),
-    key="subj_data",
+st.caption(
+    "Search protected datasets for a specific person by raw identifier. "
+    "Zyuka hashes the identifier with the project key before searching — the raw value never hits disk."
 )
+
+if not paths.protected_dir.exists():
+    empty_state(
+        "No protected dataset yet.",
+        "Run <code>zyuka protect</code> (or the full <code>zyuka run</code>) first. "
+        "Subject requests operate on the pseudonymised outputs, not raw data.",
+    )
+    st.stop()
+
 identifier = st.text_input(
-    "Raw identifier (will be hashed with the project key before searching)",
+    "Raw identifier",
     type="password",
-    key="subj_id",
+    help="e.g. NRC or phone. Hashed with your project key before lookup.",
+    key="subject_identifier",
 )
 
-col1, col2 = st.columns(2)
+tab_find, tab_erase = st.tabs(["Find", "Erase"])
 
-with col1:
-    if st.button("Find"):
+with tab_find:
+    st.markdown(
+        "Search protected files for this subject. Only file paths and row "
+        "counts are returned — no field contents."
+    )
+    if st.button("Find", type="primary", key="subject_find_btn"):
         if not identifier:
             st.warning("Enter an identifier first.")
         else:
-            matches = find_subject(Path(project), Path(data_dir), identifier)
-            if not matches:
-                st.info("No matches.")
+            try:
+                matches = find_subject(paths.root, paths.protected_dir, identifier)
+            except ZyukaError as exc:
+                st.error(exc.message)
             else:
-                for m in matches:
-                    st.write(f"- `{m.path}` ({m.row_count} rows, columns: {m.matched_columns})")
+                if not matches:
+                    st.info("No matches.")
+                else:
+                    st.success(f"Found {len(matches)} file(s).")
+                    for m in matches:
+                        st.markdown(
+                            f"- `{m.path}` — {m.row_count} row(s) "
+                            f"in columns: `{', '.join(m.matched_columns)}`"
+                        )
 
-with col2:
-    confirm = st.checkbox("I confirm this erasure is authorised.")
-    if st.button("Erase"):
+with tab_erase:
+    st.markdown(
+        "Permanently removes this subject's rows from every protected file "
+        "and writes an erasure entry to the audit log."
+    )
+    confirmed = st.checkbox(
+        "I confirm this erasure is authorised and documented.",
+        key="subject_erase_confirm",
+    )
+    if st.button("Erase", type="primary", key="subject_erase_btn"):
         if not identifier:
             st.warning("Enter an identifier first.")
-        elif not confirm:
+        elif not confirmed:
             st.warning("Tick the confirmation box first.")
         else:
-            report = erase_subject(Path(project), Path(data_dir), identifier)
-            st.success(f"Erased {report.rows_removed} rows across {len(report.files)} files.")
+            try:
+                report = erase_subject(paths.root, paths.protected_dir, identifier)
+            except ZyukaError as exc:
+                st.error(exc.message)
+            else:
+                st.success(
+                    f"Erased {report.rows_removed} row(s) across {len(report.files)} file(s)."
+                )

@@ -1,70 +1,107 @@
 """Streamlit entry point for ``zyuka gui``.
 
-The app is local-first by construction: the CLI launches it bound to
-``127.0.0.1`` with telemetry disabled. Every preview renders only column
-names, counts and masked samples — never raw PII. All heavy lifting lives
-in ``zyuka.pipeline``; the GUI is a thin wrapper.
+The home page is a workflow dashboard: it reads the current project's
+outputs directory and shows which pipeline stages have completed, which
+are next, and what the user should click. All heavy work still lives in
+``zyuka.pipeline``; this file only orchestrates state and navigation.
 """
 
 from __future__ import annotations
 
 import contextlib
-from pathlib import Path
 
 import streamlit as st
 
-from zyuka import __version__
+from zyuka.gui.components import empty_state, init_page, project_guard, workflow_step
 
-# Telemetry safety-belt: even if the user overrode their global Streamlit
-# config, the CLI launcher sets ``--browser.gatherUsageStats=false``; here
-# we additionally set the runtime option so ``streamlit run <file>`` from
-# a developer shell can't leak either.
 with contextlib.suppress(Exception):
     st.set_option("browser.gatherUsageStats", False)
 
 st.set_page_config(
     page_title="Zyuka",
-    page_icon=None,
+    page_icon="◐",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 
-def _sidebar() -> Path:
-    st.sidebar.title("Zyuka")
-    st.sidebar.caption(f"v{__version__} — local only, no telemetry")
-    project = st.sidebar.text_input("Project directory", value=str(Path.cwd()))
-    st.sidebar.info(
-        "Zyuka runs on your machine. Nothing is uploaded. "
-        "Raw personal data is never shown in this GUI."
-    )
-    return Path(project).expanduser()
-
-
 def main() -> None:
-    project_dir = _sidebar()
-    st.title("Zyuka — privacy-first M&E toolkit")
-    st.markdown(
-        """
-Use the pages on the left to upload exports, scan for PII, protect a dataset,
-compute indicators, preview reports and verify the audit log.
+    paths = init_page("Zyuka", icon="◐")
+    st.caption("Privacy-first monitoring & evaluation — local only.")
 
-- All previews are **masked**.
-- Keys stay in the file named in `zyuka.yml` and are never shown here.
-- Reports produced by the GUI are identical to those from `zyuka run`.
-        """
-    )
-    st.subheader("Project")
-    st.write(f"Directory: `{project_dir}`")
-    if not (project_dir / "zyuka.yml").exists():
-        st.warning(
-            "No `zyuka.yml` found. Run `zyuka init` first, or create one in the project directory."
+    if not project_guard(paths):
+        st.markdown(
+            "Pick a folder containing `zyuka.yml` in the sidebar, or create one with "
+            "`zyuka init` in a terminal, then reload this page."
         )
-    else:
-        st.success("`zyuka.yml` found. Ready to use.")
+        return
+
+    left, right = st.columns([2, 1], gap="large")
+
+    with left:
+        st.subheader("Workflow")
+        st.caption("Each step writes to `outputs/`. Tick marks appear as files are produced.")
+
+        data_present = paths.data_dir.exists() and any(paths.data_dir.glob("*.csv"))
+        quality_present = (paths.outputs_dir / "quality").exists() and any(
+            (paths.outputs_dir / "quality").glob("quality_flags_*.csv")
+        )
+        scan_present = (paths.outputs_dir / "scan").exists() and any(
+            (paths.outputs_dir / "scan").glob("scan_*.json")
+        )
+        protected_present = paths.protected_dir.exists() and any(
+            paths.protected_dir.glob("protected_*.csv")
+        )
+        indicators_present = (paths.outputs_dir / "indicator_results.json").exists()
+        report_present = paths.report_html.exists()
+        audit_present = paths.audit_log.exists()
+
+        workflow_step("1 · Upload & quality", quality_present, "page: Upload & Quality")
+        workflow_step("2 · Privacy scan", scan_present, "page: Privacy Scan")
+        workflow_step("3 · Protect", protected_present, "page: Protect")
+        workflow_step("4 · Indicators", indicators_present, "page: Indicators")
+        workflow_step("5 · Report", report_present, "page: Reports")
+        workflow_step("6 · Audit", audit_present, "page: Audit")
+
+        if not data_present:
+            empty_state(
+                "No data folder detected.",
+                "Place Kobo/ODK exports in <code>data/</code> inside this project, "
+                "or use the <strong>Upload & Quality</strong> page to drop a file in.",
+            )
+
+        st.divider()
+        st.subheader("Shortcuts")
+        st.markdown(
+            """
+- **Upload & Quality** — bring a CSV/XLSX in, see a masked preview and run data-quality checks.
+- **Privacy Scan** — list every column with a PII risk score.
+- **Protect** — pseudonymise and generalise identifiers.
+- **Indicators** — view logframe indicators and validate against your data.
+- **Reports** — preview the HTML report, download Excel IPTT.
+- **Audit** — verify the hash-chained audit log.
+- **Subject Requests** — honour access or erasure requests.
+            """
+        )
+
+    with right:
+        st.subheader("Project snapshot")
+        st.markdown(f"**Folder**\n`{paths.root}`")
+        if paths.config.exists():
+            st.markdown("**zyuka.yml** · present")
+        if paths.logframe.exists():
+            st.markdown("**logframe.yml** · present")
+        if report_present:
+            st.markdown("**Latest report** · available")
+
+        st.divider()
+        st.subheader("Privacy promise")
+        st.markdown(
+            "- Data stays on this machine.\n"
+            "- No telemetry, no sync, no cloud.\n"
+            "- Previews mask identifiers.\n"
+            "- Keys live outside the project folder."
+        )
 
 
-if __name__ == "__main__":  # pragma: no cover
-    main()
-else:
-    main()
+main()

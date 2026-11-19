@@ -32,6 +32,14 @@ def gui(
         "true",
         "--browser.gatherUsageStats",
         "false",
+        "--theme.primaryColor",
+        "#083344",
+        "--theme.backgroundColor",
+        "#FFFFFF",
+        "--theme.secondaryBackgroundColor",
+        "#F8FAFC",
+        "--theme.textColor",
+        "#0F172A",
     ]
     console.print(f"[green]Starting GUI on http://127.0.0.1:{port}[/green]")
     sys.exit(stcli.main())

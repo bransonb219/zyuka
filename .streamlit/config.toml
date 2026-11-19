@@ -1,0 +1,16 @@
+# Streamlit theme for local dev. The ``zyuka gui`` launcher also forces
+# browser.gatherUsageStats=false on the command line so telemetry is off
+# regardless of this file. Keep these tokens aligned with gui/theme.py.
+
+[theme]
+primaryColor = "#083344"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F8FAFC"
+textColor = "#0F172A"
+font = "sans serif"
+
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true
