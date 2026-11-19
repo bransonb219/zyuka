@@ -120,6 +120,54 @@ div[data-testid="stDataFrame"] {{
     border-radius: 0 10px 10px 0;
     margin: 0.5rem 0 1rem 0;
 }}
+
+/* MEARL coverage rows on the home page. */
+.mearl-row {{
+    display: grid;
+    grid-template-columns: 9rem 6rem 1fr;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    margin-bottom: 0.4rem;
+    background: #FFFFFF;
+}}
+.mearl-pillar {{
+    font-weight: 600;
+    color: var(--zyuka-primary);
+    letter-spacing: -0.01em;
+}}
+.mearl-badge {{
+    display: inline-block;
+    text-align: center;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}}
+.mearl-shipped {{ background: #ECFDF5; color: {PRIMARY_SOFT}; }}
+.mearl-partial {{ background: #FEF3C7; color: #B45309; }}
+.mearl-planned {{ background: #F1F5F9; color: var(--zyuka-muted); }}
+.mearl-detail {{ color: #334155; font-size: 0.9rem; }}
+
+/* Sidebar polish — Streamlit's section headers set in small-caps read as navigation. */
+section[data-testid="stSidebar"] h4 {{
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--zyuka-muted);
+    margin-top: 1rem;
+    margin-bottom: 0.3rem;
+}}
+
+/* Streamlit's auto page nav: match the brand voice. */
+div[data-testid="stSidebarNav"] ul {{
+    padding-left: 0.4rem;
+}}
 </style>
 """
 

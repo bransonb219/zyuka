@@ -9,25 +9,37 @@ are next, and what the user should click. All heavy work still lives in
 from __future__ import annotations
 
 import contextlib
+from importlib import resources
+from pathlib import Path
 
 import streamlit as st
 
-from zyuka.gui.components import empty_state, init_page, project_guard, workflow_step
+from zyuka.gui.components import (
+    empty_state,
+    init_page,
+    mearl_coverage_card,
+    project_guard,
+    workflow_step,
+)
 
 with contextlib.suppress(Exception):
     st.set_option("browser.gatherUsageStats", False)
 
+_FAVICON = Path(str(resources.files("zyuka.gui").joinpath("brand", "favicon.svg")))
+
 st.set_page_config(
-    page_title="Zyuka",
-    page_icon="◐",
+    page_title="Zyuka · MEARL toolkit",
+    page_icon=str(_FAVICON) if _FAVICON.exists() else "◐",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 
 def main() -> None:
-    paths = init_page("Zyuka", icon="◐")
-    st.caption("Privacy-first monitoring & evaluation — local only.")
+    paths = init_page("Zyuka")
+    st.caption(
+        "Privacy-first Monitoring, Evaluation, Accountability, Research & Learning — local only."
+    )
 
     if not project_guard(paths):
         st.markdown(
@@ -71,18 +83,7 @@ def main() -> None:
             )
 
         st.divider()
-        st.subheader("Shortcuts")
-        st.markdown(
-            """
-- **Upload & Quality** — bring a CSV/XLSX in, see a masked preview and run data-quality checks.
-- **Privacy Scan** — list every column with a PII risk score.
-- **Protect** — pseudonymise and generalise identifiers.
-- **Indicators** — view logframe indicators and validate against your data.
-- **Reports** — preview the HTML report, download Excel IPTT.
-- **Audit** — verify the hash-chained audit log.
-- **Subject Requests** — honour access or erasure requests.
-            """
-        )
+        mearl_coverage_card()
 
     with right:
         st.subheader("Project snapshot")
@@ -101,6 +102,17 @@ def main() -> None:
             "- No telemetry, no sync, no cloud.\n"
             "- Previews mask identifiers.\n"
             "- Keys live outside the project folder."
+        )
+
+        st.divider()
+        st.subheader("Standards followed")
+        st.markdown(
+            "- **DAC** evaluation criteria (relevance, coherence, "
+            "effectiveness, efficiency, impact, sustainability).\n"
+            "- **CHS** core humanitarian standard "
+            "(accountability, complaints handling — roadmap).\n"
+            "- **Zambia DPA 2021** · **GDPR**-aligned data handling.\n"
+            "- **IATI**-ready indicator outputs (roadmap)."
         )
 
 

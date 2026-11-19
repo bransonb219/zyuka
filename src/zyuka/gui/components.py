@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+import os
+import platform
+import subprocess
+import sys
+from importlib import resources
 from pathlib import Path
 
 import streamlit as st
@@ -11,16 +16,28 @@ from zyuka.gui.state import ProjectPaths, ensure_state, set_project_dir
 from zyuka.gui.theme import apply_theme
 
 
-def init_page(title: str, icon: str = "") -> ProjectPaths:
-    """Standard page prelude: theme + sidebar + resolved project paths.
+def _brand_asset(name: str) -> Path:
+    """Return the absolute path to a packaged brand asset.
 
-    Pages call this exactly once before rendering their own body. Returns
-    the :class:`ProjectPaths` for the currently selected project so page
-    code does not have to repeat path arithmetic.
+    The ``brand/`` folder ships inside the ``zyuka`` wheel so the GUI works
+    identically whether launched from a clone of the repo or from a pipx
+    install.
     """
+
+    files = resources.files("zyuka.gui").joinpath("brand", name)
+    return Path(str(files))
+
+
+def init_page(title: str, icon: str = "") -> ProjectPaths:
+    """Standard page prelude: theme + logo + sidebar + resolved project paths."""
 
     apply_theme()
     paths = ensure_state()
+    st.logo(
+        image=str(_brand_asset("logo.svg")),
+        icon_image=str(_brand_asset("mark.svg")),
+        size="large",
+    )
     render_sidebar(paths)
     heading = f"{icon} {title}".strip() if icon else title
     st.title(heading)
@@ -28,25 +45,20 @@ def init_page(title: str, icon: str = "") -> ProjectPaths:
 
 
 def render_sidebar(paths: ProjectPaths) -> None:
-    """Shared sidebar: brand, project picker, status, trust reminder."""
+    """Shared sidebar: brand plate, project switcher, status, round, actions, help."""
 
     sb = st.sidebar
-    sb.markdown(
-        '<div class="zyuka-brand">'
-        '<span class="mark">◐</span>'
-        '<span class="wordmark">zyuka</span>'
-        "</div>",
-        unsafe_allow_html=True,
-    )
-    sb.caption(f"v{__version__} · local only · no telemetry")
 
-    sb.markdown("### Project")
+    sb.caption(f"Zyuka v{__version__} · local only · no telemetry")
+
+    sb.markdown("#### Project")
     current = st.session_state.get("project_dir", str(Path.cwd()))
     new_value = sb.text_input(
-        "Directory",
+        "Folder",
         value=current,
         key="sidebar_project_input",
-        help="Folder containing zyuka.yml. All pages read from here.",
+        help="Directory containing zyuka.yml. All pages read from here.",
+        label_visibility="collapsed",
     )
     if new_value != current:
         set_project_dir(new_value)
@@ -54,7 +66,7 @@ def render_sidebar(paths: ProjectPaths) -> None:
 
     _render_project_status(sb, paths)
 
-    sb.markdown("### Round")
+    sb.markdown("#### Round")
     rounds = ["baseline", "midline", "endline"]
     default_idx = rounds.index(st.session_state.get("round_name", "baseline"))
     picked = sb.selectbox(
@@ -62,12 +74,23 @@ def render_sidebar(paths: ProjectPaths) -> None:
         options=rounds,
         index=default_idx,
         key="sidebar_round",
-        help="Round label applied to uploads and shown in reports.",
+        help="Label applied to uploads and shown in reports.",
+        label_visibility="collapsed",
     )
     st.session_state["round_name"] = picked
 
+    _render_sidebar_actions(sb, paths)
+
+    with sb.expander("Help", expanded=False):
+        st.markdown(
+            "- **Quickstart** — `docs/quickstart.md`\n"
+            "- **Logframe guide** — `docs/logframe-guide.md`\n"
+            "- **Data protection** — `docs/data-protection.md`\n"
+            "- **Report a bug** — open an issue on GitHub."
+        )
+
     sb.info(
-        "Zyuka runs on your machine. Nothing is uploaded. "
+        "Runs on your machine. Nothing is uploaded. "
         "Previews are masked — raw personal data never appears here."
     )
 
@@ -85,12 +108,48 @@ def _render_project_status(sb: st.delta_generator.DeltaGenerator, paths: Project
         colour = "#0F766E" if ok else "#94A3B8"
         sb.markdown(
             f'<div style="display:flex;justify-content:space-between;'
-            f'padding:2px 0;color:{colour};">'
+            f'padding:2px 0;color:{colour};font-size:0.85rem">'
             f"<span>{icon} {label}</span>"
-            f'<span style="font-size:0.8rem">{"ready" if ok else "missing"}</span>'
+            f'<span style="opacity:0.7">{"ready" if ok else "missing"}</span>'
             "</div>",
             unsafe_allow_html=True,
         )
+
+
+def _render_sidebar_actions(sb: st.delta_generator.DeltaGenerator, paths: ProjectPaths) -> None:
+    """Quick actions row — avoids forcing the user back to the terminal for small moves."""
+
+    sb.markdown("#### Actions")
+    outputs = paths.outputs_dir
+    if sb.button(
+        "Open outputs folder",
+        use_container_width=True,
+        disabled=not outputs.exists(),
+        help=f"{outputs}",
+    ):
+        _open_in_file_manager(outputs)
+    if sb.button(
+        "Open project folder",
+        use_container_width=True,
+        help=f"{paths.root}",
+    ):
+        _open_in_file_manager(paths.root)
+
+
+def _open_in_file_manager(path: Path) -> None:
+    """Cross-platform: show the given folder in the OS file manager."""
+
+    try:
+        if sys.platform.startswith("win") or platform.system() == "Windows":
+            startfile = getattr(os, "startfile", None)
+            if startfile is not None:
+                startfile(str(path))
+        elif sys.platform == "darwin":
+            subprocess.run(["open", str(path)], check=False)
+        else:
+            subprocess.run(["xdg-open", str(path)], check=False)
+    except OSError as exc:
+        st.toast(f"Could not open folder: {exc}", icon="⚠️")
 
 
 def workflow_step(label: str, done: bool, hint: str) -> None:
@@ -119,11 +178,7 @@ def empty_state(title: str, body: str, cta: str | None = None) -> None:
 
 
 def project_guard(paths: ProjectPaths) -> bool:
-    """Show a warning and return False when zyuka.yml is missing.
-
-    Pages that need a configured project call this first and short-circuit
-    if it returns False.
-    """
+    """Show a warning and return False when zyuka.yml is missing."""
 
     if paths.config.exists():
         return True
@@ -134,3 +189,32 @@ def project_guard(paths: ProjectPaths) -> bool:
         "<code>zyuka init</code> in a terminal to set one up.",
     )
     return False
+
+
+def mearl_coverage_card() -> None:
+    """Honest MEARL scope card. Shows which pillars are shipped vs planned."""
+
+    pillars = [
+        ("Monitoring", "shipped", "Quality checks, rounds, enumerator tracking, duration flags."),
+        ("Evaluation", "shipped", "Indicators engine, longitudinal change, IPTT, HTML report."),
+        ("Accountability", "planned", "Complaints & feedback mechanism, response tracking."),
+        ("Research", "partial", "Synthetic data, outlier detection; study-design helpers planned."),
+        ("Learning", "planned", "Learning briefs, after-action review, reflection prompts."),
+    ]
+    st.markdown("### MEARL coverage")
+    st.caption(
+        "What Zyuka does today, and what is on the roadmap. "
+        "See `docs/mearl-coverage.md` for the plan."
+    )
+    for name, status, detail in pillars:
+        badge_class = {"shipped": "mearl-shipped", "partial": "mearl-partial"}.get(
+            status, "mearl-planned"
+        )
+        st.markdown(
+            f'<div class="mearl-row">'
+            f'<span class="mearl-pillar">{name}</span>'
+            f'<span class="mearl-badge {badge_class}">{status}</span>'
+            f'<span class="mearl-detail">{detail}</span>'
+            "</div>",
+            unsafe_allow_html=True,
+        )
