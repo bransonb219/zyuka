@@ -17,6 +17,14 @@
 > author. The toolkit guards beneficiary data while turning raw survey exports
 > into clean data, indicators and donor-ready reports.
 
+> **New in [v0.1.1](https://github.com/bransonb219/zyuka/releases/tag/v0.1.1)**
+> — detect → clean → remember quality pipeline, EDA + analysis advisor,
+> qualitative (TF-IDF themes + lexicon sentiment), per-round data warehouse
+> with cross-round drift surfaced in the HTML report, and a per-indicator
+> evaluation payload (confidence intervals, equity gap, trajectory, pre/post
+> significance). Full detail in the
+> [changelog](CHANGELOG.md#011--2026-11-19).
+
 Zyuka is an **open-source, local-first** Monitoring & Evaluation toolkit for
 NGOs, government programmes and researchers in Zambia and the region. It:
 
