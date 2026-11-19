@@ -643,6 +643,16 @@ def run_many(df: pd.DataFrame, suggestions: Iterable[Mapping[str, Any]]) -> list
         profile_clusters,
         variance_inflation_factors,
     )
+    from zyuka.analysis.qualitative import (
+        build_codebook,
+        cluster_responses,
+        extract_themes,
+        sentiment_result,
+    )
+
+    def _texts(s: Mapping[str, Any]) -> list[str]:
+        col = s["columns"][0]
+        return [str(v) for v in df[col].dropna().tolist()]
 
     dispatch = {
         "normality": lambda s: normality_test(df, s["columns"][0]),
@@ -664,6 +674,10 @@ def run_many(df: pd.DataFrame, suggestions: Iterable[Mapping[str, Any]]) -> list
         ),
         "classifier": lambda s: classify_with_cv(df, s["columns"][0], s["columns"][1:]),
         "cluster_profile": lambda s: profile_clusters(df, s["columns"]),
+        "themes": lambda s: extract_themes(_texts(s)),
+        "response_clustering": lambda s: cluster_responses(_texts(s)),
+        "sentiment": lambda s: sentiment_result(_texts(s)),
+        "codebook": lambda s: build_codebook(_texts(s)),
     }
     results: list[AnalysisResult] = []
     for suggestion in suggestions:

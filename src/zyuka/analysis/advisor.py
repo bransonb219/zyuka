@@ -91,6 +91,7 @@ def suggest_analyses(
     exclude = set(pii_columns or [])
     numeric_cols = [c for c in profile.by_kind("numeric") if c.name not in exclude]
     cat_cols = [c for c in profile.by_kind("categorical") if c.name not in exclude]
+    text_cols = [c for c in profile.by_kind("text") if c.name not in exclude]
 
     out: list[AnalysisSuggestion] = []
     if profile.n_rows < MIN_N:
@@ -105,6 +106,7 @@ def suggest_analyses(
     out.extend(_clustering_suggestions(numeric_cols))
     out.extend(_dimensionality_suggestions(numeric_cols))
     out.extend(_classification_suggestions(numeric_cols, cat_cols, df))
+    out.extend(_qualitative_suggestions(text_cols))
 
     out.sort(key=lambda s: s.confidence, reverse=True)
     return out
@@ -415,6 +417,74 @@ def _dimensionality_suggestions(
             confidence=0.48,
         ),
     ]
+
+
+def _qualitative_suggestions(
+    text_cols: Sequence[ColumnProfile],
+) -> list[AnalysisSuggestion]:
+    out: list[AnalysisSuggestion] = []
+    for col in text_cols:
+        answered = col.n - col.missing
+        if answered < 10:
+            continue
+        out.append(
+            AnalysisSuggestion(
+                test="themes",
+                name=f"Themes — {col.name}",
+                columns=[col.name],
+                category="Qualitative",
+                rationale=f"Free-text column with {answered} responses (mean length {col.mean_length:.0f} chars).",
+                explanation=(
+                    "TF-IDF across unigrams + bigrams surfaces the vocabulary unique to this "
+                    "corpus — a starting point for building a code-book."
+                ),
+                confidence=0.6,
+            )
+        )
+        out.append(
+            AnalysisSuggestion(
+                test="sentiment",
+                name=f"Sentiment — {col.name}",
+                columns=[col.name],
+                category="Qualitative",
+                rationale=f"{answered} free-text responses — scan for positive/negative tone.",
+                explanation=(
+                    "Lexicon-based scoring with negation handling. English-only; treat the "
+                    "result as a triage signal, not a verdict."
+                ),
+                confidence=0.55,
+            )
+        )
+        if answered >= 20:
+            out.append(
+                AnalysisSuggestion(
+                    test="response_clustering",
+                    name=f"Response clustering — {col.name}",
+                    columns=[col.name],
+                    category="Qualitative",
+                    rationale=f"{answered} responses — cluster to find distinct answer types.",
+                    explanation=(
+                        "K-means on the TF-IDF matrix groups similar responses; each cluster is "
+                        "labelled by its most distinctive terms."
+                    ),
+                    confidence=0.5,
+                )
+            )
+            out.append(
+                AnalysisSuggestion(
+                    test="codebook",
+                    name=f"Code-book draft — {col.name}",
+                    columns=[col.name],
+                    category="Qualitative",
+                    rationale="Themes plus example responses, ready to hand-edit.",
+                    explanation=(
+                        "Combines the top themes with up to three example responses per theme "
+                        "— the artefact a qualitative researcher would refine."
+                    ),
+                    confidence=0.45,
+                )
+            )
+    return out
 
 
 def _classification_suggestions(
