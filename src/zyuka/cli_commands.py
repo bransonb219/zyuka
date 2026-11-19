@@ -68,6 +68,9 @@ def register(app: typer.Typer) -> None:
     from zyuka.commands import (
         subject as subject_cmd,
     )
+    from zyuka.commands import (
+        warehouse as warehouse_cmd,
+    )
 
     app.command("init", help="Create zyuka.yml, logframe.yml and a key path.")(
         _handle(init_cmd.init)
@@ -126,3 +129,5 @@ def register(app: typer.Typer) -> None:
     docs_app.command("dpia")(_handle(docs_cmd.dpia))
     docs_app.command("consent")(_handle(docs_cmd.consent))
     app.add_typer(docs_app, name="docs")
+
+    app.add_typer(warehouse_cmd.warehouse_app, name="warehouse")

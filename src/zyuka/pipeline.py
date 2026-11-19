@@ -33,6 +33,12 @@ from zyuka.reports.html import render_html
 from zyuka.security.audit import write_entry
 from zyuka.security.crypto import encrypt_file
 from zyuka.security.keys import Key, load_key
+from zyuka.warehouse.snapshot import (
+    build_snapshot,
+    compare_snapshots,
+    load_snapshots,
+    save_snapshot,
+)
 
 
 @dataclass
@@ -47,6 +53,7 @@ class RoundOutputs:
     scan_path: Path
     clean_path: Path | None = None
     review_path: Path | None = None
+    snapshot_path: Path | None = None
 
 
 @dataclass
@@ -130,11 +137,14 @@ def _process_round(
     manifest_path = protected_path.with_suffix(".manifest.json")
     manifest_path.write_text(manifest_json, encoding="utf-8")
 
+    snapshot = build_snapshot(round_name, protected_df)
+    snapshot_path = save_snapshot(snapshot, out_dir / "warehouse")
+
     write_entry(
         audit_log,
         command="run.round",
         inputs=[raw_path],
-        outputs=[protected_path, manifest_path, quality_flags_path, scan_path],
+        outputs=[protected_path, manifest_path, quality_flags_path, scan_path, snapshot_path],
         rows=len(protected_df),
         columns=len(protected_df.columns),
         settings={"round": round_name},
@@ -150,6 +160,7 @@ def _process_round(
             scan_path=scan_path,
             clean_path=clean_path,
             review_path=review_path,
+            snapshot_path=snapshot_path,
         ),
         protected_df,
     )
@@ -216,6 +227,7 @@ def _render_outputs(
     config: ZyukaConfig | None,
     out_dir: Path,
     audit_log: Path,
+    warehouse_comparison: dict[str, Any] | None = None,
 ) -> tuple[Path, Path, Path]:
     """Compute indicators and render HTML + Excel."""
 
@@ -257,6 +269,7 @@ def _render_outputs(
         programme=programme,
         data_controller=data_controller,
         small_cell_threshold=small_cell,
+        warehouse_comparison=warehouse_comparison,
     )
     render_excel(
         results,
@@ -348,12 +361,17 @@ def run_pipeline(
         round_outputs.append(out)
         protected_rounds[name] = protected_df
 
+    warehouse_dir = out_dir / "warehouse"
+    stored = load_snapshots(warehouse_dir)
+    warehouse_comparison = compare_snapshots(stored).to_dict() if len(stored) >= 2 else None
+
     html_path, excel_path, results_path = _render_outputs(
         protected_rounds=protected_rounds,
         logframe=logframe,
         config=config,
         out_dir=out_dir,
         audit_log=audit_log,
+        warehouse_comparison=warehouse_comparison,
     )
 
     if encrypt:

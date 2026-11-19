@@ -110,6 +110,91 @@
   {% endfor %}
 </section>
 
+{% if warehouse %}
+<section>
+  <h2>Cross-round data comparison</h2>
+  <p class="meta">
+    Rounds compared, in order: {{ warehouse.rounds|join(" → ")|e }}.
+    Row counts:
+    {% for r, n in warehouse.row_counts.items() %}
+      {{ r|e }}={{ n }}{% if not loop.last %}, {% endif %}
+    {% endfor %}.
+  </p>
+
+  {% set any_added = warehouse.columns_added.values()|map("length")|sum > 0 %}
+  {% set any_dropped = warehouse.columns_dropped.values()|map("length")|sum > 0 %}
+  {% if any_added or any_dropped %}
+    <h3>Columns changed between rounds</h3>
+    <table>
+      <thead><tr><th>Round</th><th>Added</th><th>Dropped</th></tr></thead>
+      <tbody>
+        {% for r in warehouse.rounds[1:] %}
+          <tr>
+            <td>{{ r|e }}</td>
+            <td>{{ warehouse.columns_added.get(r, [])|join(", ")|e or "—" }}</td>
+            <td>{{ warehouse.columns_dropped.get(r, [])|join(", ")|e or "—" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+  {% if warehouse.missingness_drift %}
+    <h3>Missingness drift (top {{ warehouse.missingness_drift|length }})</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Column</th>
+          {% for r in warehouse.rounds %}<th>{{ r|e }}</th>{% endfor %}
+          <th>Δ (pp)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in warehouse.missingness_drift %}
+          <tr>
+            <td>{{ row.column|e }}</td>
+            {% for r in warehouse.rounds %}
+              <td>
+                {% if r in row.missing_pct %}
+                  {{ "%.1f"|format(row.missing_pct[r]) }}%
+                {% else %}—{% endif %}
+              </td>
+            {% endfor %}
+            <td>{{ "%.1f"|format(row.delta_pct) }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+  {% if warehouse.numeric_mean_drift %}
+    <h3>Numeric mean drift (top {{ warehouse.numeric_mean_drift|length }})</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Column</th>
+          {% for r in warehouse.rounds %}<th>{{ r|e }}</th>{% endfor %}
+          <th>Δ (mean)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in warehouse.numeric_mean_drift %}
+          <tr>
+            <td>{{ row.column|e }}</td>
+            {% for r in warehouse.rounds %}
+              <td>
+                {% if r in row.mean %}{{ "%.2f"|format(row.mean[r]) }}{% else %}—{% endif %}
+              </td>
+            {% endfor %}
+            <td>{{ "%+.2f"|format(row.delta) }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</section>
+{% endif %}
+
 <section>
   <h2>Methodology and data protection</h2>
   <p>

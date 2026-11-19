@@ -60,6 +60,7 @@ def render_html(
     data_controller: str = "Data Controller",
     quality: dict[str, Any] | None = None,
     small_cell_threshold: int = 5,
+    warehouse_comparison: dict[str, Any] | None = None,
 ) -> Path:
     """Render an HTML report to ``out_path`` and return the path written."""
 
@@ -74,6 +75,7 @@ def render_html(
         "indicators": _enrich_indicators(list(results.get("indicators", []))),
         "quality": quality,
         "small_cell_threshold": small_cell_threshold,
+        "warehouse": warehouse_comparison,
     }
     html = _render(context)
     out_path = Path(out_path)
