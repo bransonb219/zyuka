@@ -212,7 +212,7 @@ def drop_duplicate_rows(
     flag. Ties on completeness break by index order (keep first).
     """
 
-    rows_set = {int(r) for r in rows}
+    rows_set = {int(r) for r in rows if int(r) in df.index}
     if not rows_set or key_column not in df.columns:
         return df.copy(), 0
 

@@ -47,6 +47,44 @@ def test_drop_duplicate_rows_keeps_most_complete() -> None:
     assert 0 in cleaned.index and 1 not in cleaned.index
 
 
+def test_drop_duplicate_rows_tolerates_missing_index() -> None:
+    """Earlier decisions may have dropped some flagged indices already."""
+
+    df = pd.DataFrame({"_uuid": ["b", "c"], "x": [2, 3]}, index=[1, 2])
+    cleaned, dropped = drop_duplicate_rows(df, rows=[0, 1, 2], key_column="_uuid")
+    assert dropped == 0  # Row 0 is not in the index, "b" and "c" are already unique.
+    assert len(cleaned) == 2
+
+
+def test_apply_decisions_handles_cascading_drops() -> None:
+    """Two row-level fixes on the same group should not crash if earlier drops."""
+
+    df = pd.DataFrame(
+        {
+            "_uuid": ["a", "a", "b"],
+            "x": [1, 1, 3],
+        }
+    )
+    actions = [
+        FixAction(
+            kind="drop_duplicate_rows",
+            reason="duplicate _uuid",
+            column="_uuid",
+            row_indices=(0, 1),
+            params={"key_column": "_uuid"},
+        ),
+        FixAction(
+            kind="nullify_cells",
+            reason="constraint violation",
+            column="x",
+            row_indices=(1,),  # Will have been dropped by the first action.
+        ),
+    ]
+    decisions = [CleaningDecision(action=a, status="approved") for a in actions]
+    result = apply_decisions(df, decisions)
+    assert len(result.cleaned) == 2
+
+
 def test_impute_mode_fills_blanks() -> None:
     df = pd.DataFrame({"sex": ["F", "M", None, "F", ""]})
     cleaned, filled = impute_mode(df, "sex")
