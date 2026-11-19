@@ -61,6 +61,12 @@ def main() -> None:
         clean_present = (paths.outputs_dir / "clean").exists() and any(
             (paths.outputs_dir / "clean").glob("clean_*.csv")
         )
+        eda_present = (paths.outputs_dir / "eda").exists() and any(
+            (paths.outputs_dir / "eda").glob("eda_*.json")
+        )
+        analysis_present = (paths.outputs_dir / "analysis").exists() and any(
+            (paths.outputs_dir / "analysis").glob("*.json")
+        )
         scan_present = (paths.outputs_dir / "scan").exists() and any(
             (paths.outputs_dir / "scan").glob("scan_*.json")
         )
@@ -73,11 +79,13 @@ def main() -> None:
 
         workflow_step("1 · Upload & quality", quality_present, "page: Upload & Quality")
         workflow_step("2 · Clean & approve", clean_present, "page: Clean & Approve")
-        workflow_step("3 · Privacy scan", scan_present, "page: Privacy Scan")
-        workflow_step("4 · Protect", protected_present, "page: Protect")
-        workflow_step("5 · Indicators", indicators_present, "page: Indicators")
-        workflow_step("6 · Report", report_present, "page: Reports")
-        workflow_step("7 · Audit", audit_present, "page: Audit")
+        workflow_step("3 · EDA profile", eda_present, "page: EDA")
+        workflow_step("4 · Analyze", analysis_present, "page: Analyze")
+        workflow_step("5 · Privacy scan", scan_present, "page: Privacy Scan")
+        workflow_step("6 · Protect", protected_present, "page: Protect")
+        workflow_step("7 · Indicators", indicators_present, "page: Indicators")
+        workflow_step("8 · Report", report_present, "page: Reports")
+        workflow_step("9 · Audit", audit_present, "page: Audit")
 
         if not data_present:
             empty_state(

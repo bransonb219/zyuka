@@ -15,6 +15,9 @@ def register(app: typer.Typer) -> None:
     # Imports are local so `zyuka --version` stays fast.
     from zyuka.cli import _handle
     from zyuka.commands import (
+        analyze as analyze_cmd,
+    )
+    from zyuka.commands import (
         audit as audit_cmd,
     )
     from zyuka.commands import (
@@ -34,6 +37,9 @@ def register(app: typer.Typer) -> None:
     )
     from zyuka.commands import (
         docs as docs_cmd,
+    )
+    from zyuka.commands import (
+        eda as eda_cmd,
     )
     from zyuka.commands import (
         gui as gui_cmd,
@@ -75,6 +81,13 @@ def register(app: typer.Typer) -> None:
         "clean",
         help="Apply approved fixes to a round; replays saved rules or prompts interactively.",
     )(_handle(clean_cmd.clean))
+    app.command("eda", help="Profile the dataset (dtypes, missingness, correlations).")(
+        _handle(eda_cmd.eda)
+    )
+    app.command(
+        "analyze",
+        help="Advisor + statistical tests (normality, correlation, t-test, ANOVA, OLS, k-means).",
+    )(_handle(analyze_cmd.analyze))
     app.command("scan", help="Scan for PII and sensitive fields.")(_handle(scan_cmd.scan))
     app.command("protect", help="Pseudonymise, minimise and generalise a round.")(
         _handle(protect_cmd.protect)

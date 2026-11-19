@@ -37,6 +37,9 @@ dependencies = [
     "openpyxl>=3.1",
     "matplotlib>=3.8",
     "Faker>=25.0",
+    "scipy>=1.11",
+    "statsmodels>=0.14",
+    "scikit-learn>=1.3",
 ]
 
 [project.optional-dependencies]
@@ -71,6 +74,7 @@ extend-exclude = [".venv", "zyuka-demo", "outputs"]
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "C4", "RUF"]
 ignore = ["E501"]
+allowed-confusables = ["×", "α", "β", "η", "ρ", "χ", "²", "·", "σ", "μ"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["N802", "N803", "N806"]
@@ -93,7 +97,17 @@ init_typed = true
 warn_required_dynamic_aliases = true
 
 [[tool.mypy.overrides]]
-module = ["pandas.*", "matplotlib.*", "openpyxl.*", "streamlit.*", "faker.*", "yaml.*"]
+module = [
+    "pandas.*",
+    "matplotlib.*",
+    "openpyxl.*",
+    "streamlit.*",
+    "faker.*",
+    "yaml.*",
+    "scipy.*",
+    "statsmodels.*",
+    "sklearn.*",
+]
 ignore_missing_imports = true
 
 # Command stubs lazily import modules that land in later milestones. These
