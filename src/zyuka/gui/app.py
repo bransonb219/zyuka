@@ -58,6 +58,9 @@ def main() -> None:
         quality_present = (paths.outputs_dir / "quality").exists() and any(
             (paths.outputs_dir / "quality").glob("quality_flags_*.csv")
         )
+        clean_present = (paths.outputs_dir / "clean").exists() and any(
+            (paths.outputs_dir / "clean").glob("clean_*.csv")
+        )
         scan_present = (paths.outputs_dir / "scan").exists() and any(
             (paths.outputs_dir / "scan").glob("scan_*.json")
         )
@@ -69,11 +72,12 @@ def main() -> None:
         audit_present = paths.audit_log.exists()
 
         workflow_step("1 · Upload & quality", quality_present, "page: Upload & Quality")
-        workflow_step("2 · Privacy scan", scan_present, "page: Privacy Scan")
-        workflow_step("3 · Protect", protected_present, "page: Protect")
-        workflow_step("4 · Indicators", indicators_present, "page: Indicators")
-        workflow_step("5 · Report", report_present, "page: Reports")
-        workflow_step("6 · Audit", audit_present, "page: Audit")
+        workflow_step("2 · Clean & approve", clean_present, "page: Clean & Approve")
+        workflow_step("3 · Privacy scan", scan_present, "page: Privacy Scan")
+        workflow_step("4 · Protect", protected_present, "page: Protect")
+        workflow_step("5 · Indicators", indicators_present, "page: Indicators")
+        workflow_step("6 · Report", report_present, "page: Reports")
+        workflow_step("7 · Audit", audit_present, "page: Audit")
 
         if not data_present:
             empty_state(

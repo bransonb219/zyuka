@@ -25,7 +25,9 @@ from zyuka.indicators.pipeline import compute_from_rounds
 from zyuka.ingest.rounds import load_round
 from zyuka.pipeline_support import protect_dataframe
 from zyuka.privacy.scanner import scan_dataframe
-from zyuka.quality.report import run_quality
+from zyuka.quality.remediate import apply_decisions, propose_actions
+from zyuka.quality.report import QualityReport, run_quality
+from zyuka.quality.rules import load_rules, preapproved_decisions
 from zyuka.reports.excel import render_excel
 from zyuka.reports.html import render_html
 from zyuka.security.audit import write_entry
@@ -43,6 +45,8 @@ class RoundOutputs:
     manifest_path: Path
     quality_flags_path: Path
     scan_path: Path
+    clean_path: Path | None = None
+    review_path: Path | None = None
 
 
 @dataclass
@@ -105,10 +109,21 @@ def _process_round(
     quality_flags_path.parent.mkdir(parents=True, exist_ok=True)
     quality.flags.to_csv(quality_flags_path, index=False)
 
-    scan_path = out_dir / "scan" / f"scan_{round_name}.json"
-    _write_scan_json(df, scan_path)
+    cleaned_df, clean_path, review_path = _apply_saved_cleaning(
+        df=df,
+        quality=quality,
+        project_dir=out_dir.parent,
+        out_dir=out_dir,
+        round_name=round_name,
+        audit_log=audit_log,
+    )
 
-    protected_df, manifest_json = protect_dataframe(df, config=config, logframe=logframe, key=key)
+    scan_path = out_dir / "scan" / f"scan_{round_name}.json"
+    _write_scan_json(cleaned_df, scan_path)
+
+    protected_df, manifest_json = protect_dataframe(
+        cleaned_df, config=config, logframe=logframe, key=key
+    )
     protected_path = out_dir / "protected" / f"protected_{round_name}.csv"
     protected_path.parent.mkdir(parents=True, exist_ok=True)
     protected_df.to_csv(protected_path, index=False)
@@ -133,9 +148,65 @@ def _process_round(
             manifest_path=manifest_path,
             quality_flags_path=quality_flags_path,
             scan_path=scan_path,
+            clean_path=clean_path,
+            review_path=review_path,
         ),
         protected_df,
     )
+
+
+def _apply_saved_cleaning(
+    *,
+    df: pd.DataFrame,
+    quality: QualityReport,
+    project_dir: Path,
+    out_dir: Path,
+    round_name: str,
+    audit_log: Path,
+) -> tuple[pd.DataFrame, Path | None, Path | None]:
+    """Replay any saved cleaning rules against a fresh round.
+
+    Returns ``(dataframe_to_use_downstream, clean_path, review_path)``. If
+    no rules match, returns the input ``df`` unchanged and ``None`` paths
+    so downstream stages see no difference.
+    """
+
+    rules = load_rules(project_dir)
+    if not rules.rules:
+        return df, None, None
+
+    actions = propose_actions(df, quality.flags, quality.per_column_missing)
+    decisions = preapproved_decisions(actions, rules)
+    if not decisions:
+        return df, None, None
+
+    result = apply_decisions(df, decisions)
+
+    clean_dir = out_dir / "clean"
+    clean_dir.mkdir(parents=True, exist_ok=True)
+    clean_path = clean_dir / f"clean_{round_name}.csv"
+    result.cleaned.to_csv(clean_path, index=False)
+
+    review_path = None
+    if not result.review_rows.empty:
+        review_path = clean_dir / f"review_{round_name}.csv"
+        result.review_rows.to_csv(review_path, index=False)
+
+    write_entry(
+        audit_log,
+        command="run.clean",
+        inputs=[],
+        outputs=[clean_path] + ([review_path] if review_path else []),
+        rows=len(result.cleaned),
+        columns=len(result.cleaned.columns),
+        settings={
+            "round": round_name,
+            "rules_applied": len(result.applied),
+            "source": "cleaning_rules.json",
+        },
+    )
+
+    return result.cleaned, clean_path, review_path
 
 
 def _render_outputs(

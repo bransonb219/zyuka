@@ -21,6 +21,9 @@ def register(app: typer.Typer) -> None:
         check as check_cmd,
     )
     from zyuka.commands import (
+        clean as clean_cmd,
+    )
+    from zyuka.commands import (
         compute as compute_cmd,
     )
     from zyuka.commands import (
@@ -68,6 +71,10 @@ def register(app: typer.Typer) -> None:
         _handle(run_cmd.run)
     )
     app.command("check", help="Data-quality checks on a round.")(_handle(check_cmd.check))
+    app.command(
+        "clean",
+        help="Apply approved fixes to a round; replays saved rules or prompts interactively.",
+    )(_handle(clean_cmd.clean))
     app.command("scan", help="Scan for PII and sensitive fields.")(_handle(scan_cmd.scan))
     app.command("protect", help="Pseudonymise, minimise and generalise a round.")(
         _handle(protect_cmd.protect)
