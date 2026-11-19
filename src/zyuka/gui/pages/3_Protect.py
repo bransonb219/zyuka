@@ -34,7 +34,7 @@ st.markdown(
 )
 
 st.subheader("Before (masked)")
-st.dataframe(masked_preview(df, limit=5), use_container_width=True, hide_index=True)
+st.dataframe(masked_preview(df, limit=5), width="stretch", hide_index=True)
 
 if st.button("Apply protection", type="primary"):
     try:
@@ -49,7 +49,7 @@ if st.button("Apply protection", type="primary"):
         f"Protected dataset: {len(protected):,} rows, {protected.shape[1]:,} columns retained."
     )
     st.subheader("After (masked)")
-    st.dataframe(masked_preview(protected, limit=5), use_container_width=True, hide_index=True)
+    st.dataframe(masked_preview(protected, limit=5), width="stretch", hide_index=True)
 
     c1, c2 = st.columns(2)
     stem = name.rsplit(".", 1)[0] if "." in name else name

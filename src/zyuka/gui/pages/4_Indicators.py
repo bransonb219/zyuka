@@ -64,7 +64,7 @@ rows = [
     }
     for ind in all_inds
 ]
-st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
 
 with st.expander("Structure"):
     for oc in logframe.outcomes:

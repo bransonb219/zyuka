@@ -40,8 +40,7 @@ if uploaded is not None:
         tmp_dir = Path(tempfile.mkdtemp(prefix="zyuka-gui-"))
         tmp = tmp_dir / uploaded.name
         tmp.write_bytes(uploaded.read())
-        df: pd.DataFrame = read_table(tmp)
-        df["round"] = st.session_state["round_name"]
+        df: pd.DataFrame = read_table(tmp).assign(round=st.session_state["round_name"])
         st.session_state["uploaded_df"] = df
         st.session_state["uploaded_name"] = uploaded.name
     except ZyukaError as exc:
@@ -62,7 +61,7 @@ col2.metric("Rows", f"{len(df):,}")
 col3.metric("Columns", f"{df.shape[1]:,}")
 
 st.subheader("Preview (masked)")
-st.dataframe(masked_preview(df, limit=10), use_container_width=True, hide_index=True)
+st.dataframe(masked_preview(df, limit=10), width="stretch", hide_index=True)
 st.caption(
     f"Round tag: **{st.session_state['round_name']}** (change in the sidebar). "
     "Identifier columns are starred out."
@@ -88,7 +87,7 @@ if st.button("Run quality checks", type="primary"):
         if report.flags.empty:
             st.success("No issues flagged.")
         else:
-            st.dataframe(report.flags, use_container_width=True, hide_index=True)
+            st.dataframe(report.flags, width="stretch", hide_index=True)
             st.download_button(
                 "Download flags (CSV)",
                 data=report.flags.to_csv(index=False).encode("utf-8"),

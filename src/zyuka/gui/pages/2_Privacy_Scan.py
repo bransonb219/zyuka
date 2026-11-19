@@ -57,7 +57,7 @@ if st.button("Run privacy scan", type="primary"):
     c3.metric("Low risk", by_risk.get("low", 0))
 
     st.subheader("Columns")
-    st.dataframe(scan_df, use_container_width=True, hide_index=True)
+    st.dataframe(scan_df, width="stretch", hide_index=True)
 
     if by_risk.get("high", 0) > 0:
         st.warning(

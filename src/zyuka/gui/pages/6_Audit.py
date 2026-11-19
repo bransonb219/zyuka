@@ -45,7 +45,7 @@ rows = [
     }
     for e in entries
 ]
-st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
 
 st.download_button(
     "Download audit log (JSONL)",

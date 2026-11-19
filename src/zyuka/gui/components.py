@@ -72,7 +72,7 @@ def render_sidebar(paths: ProjectPaths) -> None:
     )
 
 
-def _render_project_status(sb: "st.delta_generator.DeltaGenerator", paths: ProjectPaths) -> None:
+def _render_project_status(sb: st.delta_generator.DeltaGenerator, paths: ProjectPaths) -> None:
     """One-glance health badges for the sidebar."""
 
     checks = [
