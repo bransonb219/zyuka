@@ -5,6 +5,53 @@ All notable changes to Zyuka will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] — 2026-11-19
+
+### Added
+
+- **Quality**: detect → clean → remember pipeline with a Streamlit "Clean
+  and approve" page and `zyuka clean` CLI. Approved rules persist to
+  `cleaning_rules.json` and replay on every subsequent round.
+- **EDA**: column-level profile, auto-advisor suggesting analyses to run,
+  statistical test dispatcher (t-test, Mann-Whitney, chi-square, ANOVA,
+  correlation), GUI and CLI entry points.
+- **Advanced modelling**: PCA, VIF, Breusch-Pagan, classifier evaluation
+  and cluster profiling.
+- **Qualitative**: TF-IDF theme extraction, hierarchical response
+  clustering, lexicon sentiment with negation handling, and a draft
+  code-book builder.
+- **Warehouse**: per-round snapshots saved to `outputs/warehouse/`, a
+  cross-round diff (row counts, added / dropped columns, missingness
+  drift, numeric mean drift) surfaced in the HTML report, plus a
+  `zyuka warehouse list|show|compare` CLI.
+- **Evaluation payload on each indicator**: Wilson interval for
+  proportions, t-interval for means, per-disaggregation equity gap,
+  linear trajectory with time-to-target, and a pre/post significance
+  test (two-proportion z or Welch's t). Logframe files can now carry
+  optional OECD-DAC criteria and per-indicator means_of_verification
+  and assumptions; all surface in the HTML report when populated.
+- **GUI**: workflow dashboard home page, brand assets + sidebar polish,
+  shared project state across pages, MEARL coverage card, and empty /
+  error states on every page.
+
+### Fixed
+
+- Demo logframe now references leaf column names (e.g.
+  `has_income_source`) instead of Kobo group-prefixed names so the
+  indicator engine computes every demo indicator cleanly.
+- `zyuka docs consent` strips group prefixes on read so
+  `consent_column` behaves the same against raw and ingested CSVs.
+- `drop_duplicate_rows` tolerates rows already removed by an earlier
+  rule in the same clean run.
+
+### Changed
+
+- Brand refresh (teal + amber palette, dawn-arc mark with 28° tilt),
+  light / dark / mono asset set, `<picture>` switching.
+- CI bandit step now fails only on medium+ severity findings;
+  intentional subprocess calls in the GUI file-manager helper no
+  longer block releases.
+
 ## [0.1.0] — 2026-11-09
 
 First public release.

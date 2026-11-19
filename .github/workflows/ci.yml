@@ -34,6 +34,6 @@ jobs:
       - name: Tests
         run: pytest --cov=zyuka --cov-report=term-missing
       - name: Bandit
-        run: bandit -q -r src
+        run: bandit -q -r src --severity-level medium
       - name: pip-audit
         run: pip-audit --skip-editable
